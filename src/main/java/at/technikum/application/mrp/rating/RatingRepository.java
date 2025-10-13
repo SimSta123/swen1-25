@@ -1,0 +1,16 @@
+package at.technikum.application.mrp.rating;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface RatingRepository {
+    Optional<Rating> find(String id);
+
+    List<Rating> findAll();
+
+    Rating save(Rating user);
+
+    // Todo update(Todo todo);
+
+    Rating delete(String id);
+}

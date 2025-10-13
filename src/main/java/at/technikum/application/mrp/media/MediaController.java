@@ -1,31 +1,28 @@
-package at.technikum.application.todo.controller;
+package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.Controller;
-import at.technikum.application.todo.model.Todo;
-import at.technikum.application.todo.service.TodoService;
-import at.technikum.server.http.Method;
-import at.technikum.server.http.Request;
-import at.technikum.server.http.Response;
-import at.technikum.server.http.Status;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import at.technikum.server.http.*;
 
 import java.util.List;
 
-public class TodoController extends Controller {
 
-    private final TodoService todoService;
+public class MediaController extends Controller {
 
-    public TodoController(TodoService todoService) {
-        this.todoService = todoService;
+    private final MediaService mediaService;
+
+    public MediaController(MediaService mediaService) {
+        this.mediaService = mediaService;
     }
 
     @Override
     public Response handle(Request request) {
 
         if (request.getMethod().equals(Method.GET.getVerb())) {
-            if (request.getPath().equals("/todos")) {
+            if (request.getPath().equals("/media")) {
                 return readAll();
+            }
+            if (request.getPath().equals("/media/register")) {
+                return create(request);
             }
             return read();
         }
@@ -46,19 +43,26 @@ public class TodoController extends Controller {
     }
 
     private Response readAll() {
-        List<Todo> todos = todoService.getAll();
+        List<Media> media = mediaService.getAll();
 
-        return text(todos.toString());
+        text(media.toString());
+        Response response = new Response();
+        response.setStatus(Status.OK);
+        response.setContentType(ContentType.TEXT_PLAIN);
+        response.setBody("Media");
+        return response;
+        //return text(media.toString());
     }
 
     private Response read() {
+
         return null;
+
     }
 
     private Response create(Request request) {
-        Todo todo = toObject(request.getBody(), Todo.class);
-        todo = todoService.create(todo);
-        return json(todo, Status.CREATED);
+
+        return null;
     }
 
     private Response update() {

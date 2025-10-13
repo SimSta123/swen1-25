@@ -1,5 +1,6 @@
 package at.technikum;
 
+import at.technikum.application.MRPApplication;
 import at.technikum.application.echo.EchoApplication;
 import at.technikum.application.todo.TodoApplication;
 import at.technikum.application.weather.WeatherApplication;
@@ -10,7 +11,7 @@ public class Main {
 
         Server server = new Server(
             8080,
-            new TodoApplication()
+            new MRPApplication()
         );
         server.start();
     }
