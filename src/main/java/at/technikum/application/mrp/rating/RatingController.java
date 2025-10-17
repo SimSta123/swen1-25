@@ -1,6 +1,7 @@
 package at.technikum.application.mrp.rating;
 
 import at.technikum.application.common.Controller;
+import at.technikum.application.mrp.UrlID;
 import at.technikum.server.http.*;
 
 import java.util.List;
@@ -16,26 +17,45 @@ public class RatingController extends Controller {
     @Override
     public Response handle(Request request) {
 
+        int id = UrlID.urlID(request.getPath());
+
         if (request.getMethod().equals(Method.GET.getVerb())) {
-            if (request.getPath().equals("/rating")) {
-                return readAll();
-            }
-            return read();
+                return json("doesn't exist yet",Status.NOT_FOUND);
+            //return read();
         }
 
         if (request.getMethod().equals(Method.POST.getVerb())) {
-            return create(request);
+            if (request.getPath().equals("/api/ratings/"+id+"/rate")) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return create(request);
+            }
+            if (request.getPath().equals("/api/ratings/"+id+"/like")) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return create(request);
+            }
+            if (request.getPath().equals("/api/ratings/"+id+"/confirm")) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+            }
+            return json("doesn't exist yet",Status.NOT_FOUND);
         }
 
         if (request.getMethod().equals(Method.PUT.getVerb())) {
-            return update();
+            if (request.getPath().equals("/api/ratings/"+id)) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+            }
+            return json("doesn't exist yet",Status.NOT_FOUND);
         }
 
         if (request.getMethod().equals(Method.DELETE.getVerb())) {
-            return delete();
+            if (request.getPath().equals("/api/ratings/"+id)) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+            }
+            return json("doesn't exist yet",Status.NOT_FOUND);
         }
 
-        return null;
+        return json("doesn't exist yet",Status.NOT_FOUND);
+
+
     }
 
     private Response readAll() {

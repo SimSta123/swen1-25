@@ -1,8 +1,10 @@
 package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.Controller;
+import at.technikum.application.mrp.UrlID;
 import at.technikum.server.http.*;
 
+import javax.sound.midi.SysexMessage;
 import java.util.List;
 
 
@@ -17,29 +19,55 @@ public class MediaController extends Controller {
     @Override
     public Response handle(Request request) {
 
+        System.out.println("Media URL________________________-1");
+        System.out.println(UrlID.urlID(request.getPath()));
+        int id = 0;
+        try {
+            id = UrlID.urlID(request.getPath());
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Media URL________________________");
+
         if (request.getMethod().equals(Method.GET.getVerb())) {
-            if (request.getPath().equals("/media")) {
-                return readAll();
+            System.out.println("Media_GET_______________________");
+            if (request.getPath().equals("/api/media")) {
+                System.out.println("only Media_GET______________________________");
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return readAll();
+            } else if (request.getPath().equals("/api/media/"+id)) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return read(id);
+            } else {
+                return json("doesn't exist yet", Status.NOT_FOUND);
             }
-            if (request.getPath().equals("/media/register")) {
-                return create(request);
+        } else if (request.getMethod().equals(Method.POST.getVerb())) {
+            if (request.getPath().equals("/api/media")) {
+                //return create(request);
+                return json("doesnt exist yet", Status.BAD_REQUEST);
+            } else {
+                return json("doesnt exist yet", Status.BAD_REQUEST);
             }
-            return read();
-        }
-
-        if (request.getMethod().equals(Method.POST.getVerb())) {
-            return create(request);
-        }
-
-        if (request.getMethod().equals(Method.PUT.getVerb())) {
-            return update();
+        } else if (request.getMethod().equals(Method.PUT.getVerb())) {
+            String path = "/api/media/"+id;
+            if (request.getPath().equals(path)) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return update();
+            } else {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+            }
         }
 
         if (request.getMethod().equals(Method.DELETE.getVerb())) {
-            return delete();
-        }
 
-        return null;
+            String path = "/api/media/"+id;
+            if (request.getPath().equals(path)) {
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return delete();
+            }
+            return json("doesn't exist yet",Status.NOT_FOUND);
+        }
+        return json("doesn't exist yet",Status.NOT_FOUND);
     }
 
     private Response readAll() {

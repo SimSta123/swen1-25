@@ -4,6 +4,7 @@ public enum Status {
 
     OK(200, "OK"),
     CREATED(201, "Created"),
+    NOT_CREATED(204, "Not Created"),
 
     BAD_REQUEST(400, "Bad Request"),
     NOT_FOUND(404, "Not Found"),

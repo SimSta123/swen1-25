@@ -5,15 +5,20 @@ import at.technikum.application.mrp.media.Media;
 import java.util.List;
 
 public class Rating {
+    private int id;
     private Media media;
     private int rating;
     private String comment;
     private String timeStamp;
     private List<Integer> like;
-    private int creator;
+    private int creatorID;
     private boolean confirmed;
 
     public Rating() {}
+
+    public void setId(int id) { this.id = id; }
+
+    public int getId() { return id; }
 
     public Media getMedia() {
         return media;
@@ -56,11 +61,11 @@ public class Rating {
     }
 
     public int getCreator() {
-        return creator;
+        return creatorID;
     }
 
     public void setCreator(int creator) {
-        this.creator = creator;
+        this.creatorID = creator;
     }
 
     public boolean isConfirmed() {

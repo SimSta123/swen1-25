@@ -5,19 +5,24 @@ import java.util.List;
 public class User {
     private String username;
     private String password;
-    private String id;
+    private String uuid;
+    private int id;
     private boolean done;
     private List<String> favGenre;
     private List<String> favMedia;
     private List<String> likedEntries;
 
-    public String getId() {
-        return id;
+    public String getUUId() {
+        return uuid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUUId(String id) {
+        this.uuid = id;
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 
     public String getUsername() {
         return username;

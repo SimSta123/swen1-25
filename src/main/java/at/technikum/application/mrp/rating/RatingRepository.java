@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RatingRepository {
+
     Optional<Rating> find(String id);
 
     List<Rating> findAll();

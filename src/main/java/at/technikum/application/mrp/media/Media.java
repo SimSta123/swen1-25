@@ -6,9 +6,11 @@ import java.util.List;
 
 public class Media {
 
+    /*
     private boolean movie;
     private boolean series;
     private boolean game;
+     */
     private String title;
     private String description;
     private String mediaType;
@@ -19,7 +21,10 @@ public class Media {
     private List<Rating> rating;
     private double averageRating;
     private boolean isDone;
+    private int mediaID;
+    //private List<String> type;
 
+    /*
     public boolean isMovie() {
         return movie;
     }
@@ -43,7 +48,7 @@ public class Media {
     public void setGame(boolean game) {
         this.game = game;
     }
-
+    */
     public String getTitle() {
         return title;
     }
@@ -122,5 +127,13 @@ public class Media {
 
     public void setDone(boolean done) {
         isDone = done;
+    }
+
+    public void setMediaID(int mediaID) {
+        this.mediaID = mediaID;
+    }
+
+    public int getMediaID() {
+        return mediaID;
     }
 }
