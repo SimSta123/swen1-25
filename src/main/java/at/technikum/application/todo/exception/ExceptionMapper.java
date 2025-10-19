@@ -18,7 +18,7 @@ public class ExceptionMapper {
     public Response toResponse(Exception exception) {
         Response response = new Response();
 
-        /*
+
         if (exception instanceof EntityNotFoundException) {
             response.setStatus(Status.NOT_FOUND);
             response.setContentType(ContentType.TEXT_PLAIN);
@@ -26,7 +26,6 @@ public class ExceptionMapper {
 
             return response;
         }
-        */
 
         /*
         Annotation annotation = exception.getClass().getAnnotation(HttpStatus.class)

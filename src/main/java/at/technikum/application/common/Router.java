@@ -7,6 +7,7 @@ import java.util.Optional;
 public class Router {
 
     private List<Route> routes;
+    private Controller fallbackController; //Fallback-Controller für 404
 
     public Router() {
         this.routes = new ArrayList<>();
@@ -18,6 +19,17 @@ public class Router {
                 return Optional.of(route.getController());
             }
         }
+        //return Optional.empty();
+
+        //abfangen wenn nur /api
+        if (path.startsWith("/api") && fallbackController != null) {
+            return Optional.of(fallbackController);
+        }
+
+        // Wenn keine Route passt → Fallback oder empty
+        if (fallbackController != null) {
+            return Optional.of(fallbackController);
+        }
         return Optional.empty();
     }
 
@@ -25,5 +37,11 @@ public class Router {
         routes.add(
                 new Route(path, controller)
         );
+    }
+    /**
+     * Setzt einen Controller, der für alle unbekannten Routen aufgerufen wird.
+     */
+    public void setFallback(Controller fallbackController) {
+        this.fallbackController = fallbackController;
     }
 }

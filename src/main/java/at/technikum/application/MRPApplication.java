@@ -1,24 +1,13 @@
 package at.technikum.application;
 
-import at.technikum.application.common.Application;
-import at.technikum.application.common.Controller;
-import at.technikum.application.common.Router;
-import at.technikum.application.mrp.rating.RatingController;
-import at.technikum.application.mrp.rating.RatingRepositoryC;
-import at.technikum.application.mrp.rating.RatingService;
+import at.technikum.application.common.*;
+import at.technikum.application.mrp.leaderboard.*;
+import at.technikum.application.mrp.rating.*;
 import at.technikum.application.mrp.media.*;
+import at.technikum.application.mrp.route_not_found.NotFoundController;
 import at.technikum.application.mrp.user.*;
-import at.technikum.application.todo.exception.EntityNotFoundException;
-import at.technikum.application.todo.exception.ExceptionMapper;
-import at.technikum.application.mrp.user.UserController;
-import at.technikum.application.todo.exception.JsonConversionException;
-import at.technikum.application.todo.exception.NotJsonBodyException;
-import at.technikum.server.http.ContentType;
-import at.technikum.server.http.Request;
-import at.technikum.server.http.Response;
-import at.technikum.server.http.Status;
-import at.technikum.application.*;
-
+import at.technikum.application.todo.exception.*;
+import at.technikum.server.http.*;
 
 public class MRPApplication implements Application {
 
@@ -27,10 +16,13 @@ public class MRPApplication implements Application {
 
     public MRPApplication() {
         this.router = new Router();
+        router.setFallback(new NotFoundController());
 
         router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC())));
         router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC())));
         router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC())));
+        router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC())));
+
 
         this.exceptionMapper = new ExceptionMapper();
         this.exceptionMapper.register(EntityNotFoundException.class, Status.NOT_FOUND);
@@ -42,13 +34,15 @@ public class MRPApplication implements Application {
     public Response handle(Request request) {
         try {
             Controller controller = router.findController(request.getPath())
-                    .orElseThrow(RuntimeException::new);
+                    .orElseThrow(() -> new EntityNotFoundException("No route found for " + request.getPath()));
 
             return controller.handle(request);
         } catch (Exception ex) {
-            // map exception to http response
+           Response r = new Response();
+           r.setBody(ex.getMessage());
+            return r;
         }
-        return null;
+        //return null;
     }
 }
 

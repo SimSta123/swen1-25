@@ -1,17 +1,20 @@
 package at.technikum.application.common;
 
+import at.technikum.application.mrp.media.Media;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface Repository<T> {
 
-    Optional<T> find(String id);
+    Optional<T> find(T object);
 
     List<T> findAll();
 
-    <T> void save(T object);
+    T save(T object);
 
     // Todo update(Todo todo);
 
-    String delete(String id);
+    T delete(T object);
+
 }

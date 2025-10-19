@@ -29,7 +29,7 @@ public class UserRepositoryC implements UserRepository {
     }
 
     @Override
-    public User delete(String id) {
+    public User delete(int id) {
         return null;
     }
 }

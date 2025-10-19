@@ -52,10 +52,7 @@ public class RatingController extends Controller {
             }
             return json("doesn't exist yet",Status.NOT_FOUND);
         }
-
         return json("doesn't exist yet",Status.NOT_FOUND);
-
-
     }
 
     private Response readAll() {

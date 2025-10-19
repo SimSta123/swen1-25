@@ -32,9 +32,6 @@ public class UserService {
         }
         user.setUUId(UUID.randomUUID().toString());
         user.setId(users.size()+1);
-        System.out.println("ID done");
-        //auth.createToken(user);
-        //System.out.println("Token created");
         user.setDone(true);
         users.add(user);
 
@@ -60,21 +57,16 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User delete(String id) {
+    public User delete(int id) {
         return userRepository.delete(id);
     }
 
+    //Hier noch, weil im Moment hier die User in einer Liste gepsiechert werden.
     public boolean logIn(User user) {
         if(!AuthService.checkData(user)){
             throw new IllegalArgumentException("Username or Password Illegal");
         }
         System.out.println("Username and password passed verification");
-        /* Muss der User hier ein Token schon haben? eig Nicht
-        if(!auth.checkToken(user)){
-            System.out.println("Token is Invalid");
-            throw new IllegalArgumentException("No Token");
-        }
-        */
         boolean unExists = users.stream()
                 .anyMatch(u -> u.getUsername().equals(user.getUsername()));
         System.out.println("Username exists");
@@ -120,6 +112,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("UserID not found"));
          */
         for(User u : users){
+            System.out.println(u.getId()+"-----------------");
             if(u.getId() == id){
                 return u;
             }

@@ -1,4 +1,4 @@
-package at.technikum.application.mrp.media;
+package at.technikum.application.mrp.leaderboard;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
@@ -8,12 +8,12 @@ import javax.sound.midi.SysexMessage;
 import java.util.List;
 
 
-public class MediaController extends Controller {
+public class LeaderboardController extends Controller {
 
-    private final MediaService mediaService;
+    private final LeaderboardService leaderboardService;
 
-    public MediaController(MediaService mediaService) {
-        this.mediaService = mediaService;
+    public LeaderboardController(LeaderboardService leaderboardService) {
+        this.leaderboardService = leaderboardService;
     }
 
     @Override
@@ -22,40 +22,28 @@ public class MediaController extends Controller {
         int id = UrlID.urlID(request.getPath());
 
         if (request.getMethod().equals(Method.GET.getVerb())) {
-            if (request.getPath().equals("/api/media")) {
+            if (request.getPath().equals("/api/leaderboard")) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
-                //return readAll();
-            } else if (request.getPath().equals("/api/media/"+id)) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-                //return read(id);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
         } else if (request.getMethod().equals(Method.POST.getVerb())) {
-            if (request.getPath().equals("/api/media")) {
-                //return create(request);
-                return json("doesnt exist yet", Status.NOT_FOUND);
-            } else if(request.getPath().equals("/api/media"+id+"/favorite")) {
+            if (request.getPath().equals("/api/leaderboard")) {
                 return json("doesnt exist yet", Status.NOT_FOUND);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
         } else if (request.getMethod().equals(Method.PUT.getVerb())) {
-            String path = "/api/media/"+id;
-            if (request.getPath().equals(path)) {
+            if (request.getPath().equals("/api/leaderboard"+id)) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
                 //return update();
             } else {
                 return json("doesn't exist yet",Status.NOT_FOUND);
             }
         }
-
         if (request.getMethod().equals(Method.DELETE.getVerb())) {
-            if (request.getPath().equals("/api/media/"+id)) {
+            if (request.getPath().equals("/api/leaderboard")) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
-                //return delete();
-            } if(request.getPath().equals("/api/media"+id+"/favorite")) {
-                return json("doesnt exist yet", Status.NOT_FOUND);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
@@ -64,13 +52,13 @@ public class MediaController extends Controller {
     }
 
     private Response readAll() {
-        List<Media> media = mediaService.getAll();
+        List<Leaderboard> media = leaderboardService.getAll();
 
         text(media.toString());
         Response response = new Response();
         response.setStatus(Status.OK);
         response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody("Media");
+        response.setBody("Leaderboard");
         return response;
         //return text(media.toString());
     }

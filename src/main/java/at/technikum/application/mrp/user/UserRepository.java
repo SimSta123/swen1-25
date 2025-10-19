@@ -13,5 +13,5 @@ public interface UserRepository {
 
     // Todo update(Todo todo);
 
-    User delete(String id);
+    User delete(int id);
 }
