@@ -1,6 +1,6 @@
 package at.technikum.server.http;
 
-import com.sun.net.httpserver.HttpExchange;
+import java.util.Map;
 
 public class Request {
 

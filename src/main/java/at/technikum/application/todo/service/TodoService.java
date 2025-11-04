@@ -31,6 +31,13 @@ public class TodoService {
         return todoRepository.findAll();
     }
 
+    public List<Todo> getAllOpen() {
+        return todoRepository.findAll()
+                .stream()
+                .filter(todo -> !todo.isDone())
+                .toList();
+    }
+
     public Todo update(String id, Todo update) {
         Todo todo = todoRepository.find(id)
                 .orElseThrow(EntityNotFoundException::new);

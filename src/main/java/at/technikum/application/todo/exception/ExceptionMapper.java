@@ -38,7 +38,7 @@ public class ExceptionMapper {
          */
 
         Status status = map.get(exception.getClass());
-        if (null != status) {
+        if (null == status) {
             status = Status.INTERNAL_SERVER_ERROR;
         }
 

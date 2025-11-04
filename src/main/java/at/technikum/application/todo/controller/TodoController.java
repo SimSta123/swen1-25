@@ -7,8 +7,6 @@ import at.technikum.server.http.Method;
 import at.technikum.server.http.Request;
 import at.technikum.server.http.Response;
 import at.technikum.server.http.Status;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 

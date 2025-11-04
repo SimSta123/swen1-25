@@ -8,7 +8,15 @@ public class Todo {
 
     private boolean done;
 
+    private User creator;
+
     public Todo() {
+    }
+
+    public Todo(String id, String description, boolean done) {
+        this.id = id;
+        this.description = description;
+        this.done = done;
     }
 
     public String getId() {
