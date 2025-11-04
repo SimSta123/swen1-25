@@ -23,8 +23,8 @@ public class UserController extends Controller {
             System.out.println("GET: "+UrlID.urlID(request.getPath()));
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/profile")) {
                 //Hier soll die ID von der JSON oder von dem URL Path??
-                //return read(UrlID.urlID(request.getPath()));
-                return json("doesn't exist yet",Status.NOT_FOUND);
+                return read(UrlID.urlID(request.getPath()));
+                //return json("doesn't exist yet",Status.NOT_FOUND);
             }
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/ratings")) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
@@ -121,6 +121,7 @@ public class UserController extends Controller {
     }
 
     private Response logIn(Request request) {
+        //ganz in den AuthService
         User user = toObject(request.getBody(), User.class);
         try {
             boolean logedIn = userService.logIn(user);
@@ -133,7 +134,7 @@ public class UserController extends Controller {
             else {
                 response.setBody("user log in failed");
             }
-            return json(response, Status.CREATED);
+            return json(response, Status.OK);
         } catch (Exception e) {
             return json(e.getMessage(), Status.BAD_REQUEST);
         }

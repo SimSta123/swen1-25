@@ -22,15 +22,13 @@ public class Router {
         //return Optional.empty();
 
         //abfangen wenn nur /api
-        if (path.startsWith("/api") && fallbackController != null) {
+        if (path.startsWith("/api")) {
             return Optional.of(fallbackController);
         }
 
-        // Wenn keine Route passt → Fallback oder empty
-        if (fallbackController != null) {
-            return Optional.of(fallbackController);
-        }
-        return Optional.empty();
+        // Wenn keine Route passt
+        return Optional.of(fallbackController); //Optional damit immer etwas zurückgegeben wird
+        //return Optional.empty();
     }
 
     public void addRoute(String path, Controller controller) {

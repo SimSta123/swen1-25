@@ -73,8 +73,8 @@ public class UserService {
         if(unExists==true){
             User foundUser = users.stream()
                     .filter(u -> u.getUsername().equals(user.getUsername()))
-                    .findFirst()
-                    .orElse(null);
+                    .findFirst()//first element of the Stream, optional zurück, weil es einen Stream zurückgiebt
+                    .orElse(null); //wenn kein Wert dann null
             if(foundUser.getPassword().equals(user.getPassword())){
                 System.out.println("User loged in");
                 auth.createToken(user);

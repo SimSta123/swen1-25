@@ -8,7 +8,10 @@ public class Response {
 
     private String body;
 
+    private boolean auth;
+
     public Response() {
+        auth = false;
     }
 
     public Response(Status status, ContentType contentType, String body) {
@@ -44,4 +47,8 @@ public class Response {
     public void setBody(String body) {
         this.body = body;
     }
+
+    public void setAuth(boolean auth) { this.auth = auth; }
+
+    public boolean getAuth() { return auth; }
 }
