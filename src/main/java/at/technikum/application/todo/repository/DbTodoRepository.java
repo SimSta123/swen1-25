@@ -30,7 +30,7 @@ public class DbTodoRepository implements TodoRepository {
 
             pstmt.setString(1, id);
 
-            try (ResultSet rs = pstmt.getResultSet()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 if (!rs.next()) {
                     return Optional.empty();
                 }

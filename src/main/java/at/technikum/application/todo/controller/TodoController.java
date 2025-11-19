@@ -25,7 +25,7 @@ public class TodoController extends Controller {
             if (request.getPath().equals("/todos")) {
                 return readAll();
             }
-            return read();
+            return read(request.getPath().replace("/todos/", ""));
         }
 
         if (request.getMethod().equals(Method.POST.getVerb())) {
@@ -49,8 +49,9 @@ public class TodoController extends Controller {
         return text(todos.toString());
     }
 
-    private Response read() {
-        return null;
+    private Response read(String id) {
+        Todo todo = todoService.get(id);
+        return json(todo, Status.OK);
     }
 
     private Response create(Request request) {
