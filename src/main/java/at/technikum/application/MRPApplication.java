@@ -13,13 +13,23 @@ public class MRPApplication implements Application {
 
     private final Router router;
     private final ExceptionMapper exceptionMapper;
+    private final ConnectionPool connectionPool;
 
     public MRPApplication() {
         this.router = new Router();
         router.setFallback(new NotFoundController());
 
-        router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC())));
-        router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC())));
+        this.connectionPool = new ConnectionPool(
+                "postgresql",
+                "localhost",
+                5432,
+                "swen1user",
+                "swen1db", // secretManager.get("DB_PW")
+                "mrpdb"
+        );
+
+        router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool))));
+        router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool))));
         router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC())));
         router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC())));
 

@@ -17,7 +17,7 @@ public class Media {
     private int releaseYear;
     private List<String> genre;
     private int ageRestriction;
-    private int creatorUUID;
+    private String creatorUUID;
     private List<Rating> rating;
     private double averageRating;
     private boolean isDone;
@@ -97,11 +97,11 @@ public class Media {
         this.ageRestriction = ageRestriction;
     }
 
-    public int getCreatorUUID() {
+    public String getCreatorUUID() {
         return creatorUUID;
     }
 
-    public void setCreatorUUID(int creatorUUID) {
+    public void setCreatorUUID(String creatorUUID) {
         this.creatorUUID = creatorUUID;
     }
 

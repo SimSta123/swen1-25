@@ -4,11 +4,9 @@ services:
     environment:
       POSTGRES_PASSWORD: swen1db
       POSTGRES_USER: swen1user
-      POSTGRES_DB: tododb
+      POSTGRES_DB: mrpdb
     ports:
       - 5432:5432
     volumes:
       - swen1v:/var/lib/postgresql
 
-volumes:
-  swen1v:

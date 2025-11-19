@@ -23,6 +23,7 @@ public class ConnectionPool {
         this.password = password;
         this.dbName = dbName;
 
+        //URL so verarbeiten
         this.jdbcConnectionUrl
                 = "jdbc:%s://%s:%s/%s"
                 .formatted(dbType, host, port, dbName);

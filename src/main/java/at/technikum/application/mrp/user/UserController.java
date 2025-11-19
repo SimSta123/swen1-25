@@ -61,7 +61,15 @@ public class UserController extends Controller {
         }
 
         if (request.getMethod().equals(Method.DELETE.getVerb())) {
-            return json("doesn't exist yet, user.DELETE",Status.NOT_FOUND);
+            System.out.println("try to go to delete");
+            System.out.println("DELETE: "+UrlID.urlID(request.getPath()));
+            //return json("doesn't exist yet, user.DELETE",Status.NOT_FOUND);
+            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/delete")) {
+                //Hier soll die ID von der JSON oder von dem URL Path??
+                System.out.println("try to start delete method");
+                return delete(UrlID.urlID(request.getPath()));
+            }
+            return json("doesn't exist yet",Status.NOT_FOUND);
         }
         return null;
     }
@@ -146,8 +154,19 @@ public class UserController extends Controller {
         return null;
     }
 
-    private Response delete() {
-        return null;
+    private Response delete(int id) {
+        try {
+            System.out.println("in DELETE try to Start userService delete");
+            userService.delete(id);
+        } catch (Exception e) {
+            return json(e.getMessage(), Status.BAD_REQUEST);
+        }
+
+        Response response = new Response();
+        response.setStatus(Status.OK);
+        response.setContentType(ContentType.TEXT_PLAIN);
+        response.setBody("user deleted");
+        return json(response, Status.NO_CONTENT);
     }
 }
 

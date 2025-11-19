@@ -2,10 +2,8 @@ package at.technikum.application.mrp.user;
 
 import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.exception.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
 
 public class UserService {
 
@@ -33,9 +31,12 @@ public class UserService {
         user.setUUId(UUID.randomUUID().toString());
         user.setId(users.size()+1);
         user.setDone(true);
+        //UUID uuid = UUID.randomUUID();
+        //user.setUUId(uuid.toString());
         users.add(user);
-
-        return userRepository.save(user);
+        Optional<User> optionalUser = userRepository.save(user);
+        User savedUser = optionalUser.get();
+        return savedUser;
     }
 
     public User get(String id) {
@@ -48,17 +49,19 @@ public class UserService {
     }
 
     public User update(String id, User update) {
+        /*
         User user = userRepository.find(id)
                 .orElseThrow(EntityNotFoundException::new);
 
         user.setUsername(update.getUsername());
         user.setDone(update.isDone());
+         */
 
-        return userRepository.save(user);
+        return userRepository.update(update);
     }
 
     public User delete(int id) {
-        return userRepository.delete(id);
+        return userRepository.delete(String.valueOf(id));
     }
 
     //Hier noch, weil im Moment hier die User in einer Liste gepsiechert werden.
@@ -111,13 +114,17 @@ public class UserService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("UserID not found"));
          */
-        for(User u : users){
+        /*for(User u : users){
             System.out.println(u.getId()+"-----------------");
             if(u.getId() == id){
                 return u;
             }
         }
-        throw new EntityNotFoundException("UserID doesn't exist");
+         */
+        Optional<User> optionalUser = userRepository.find(String.valueOf(id));
+        User foundUser = optionalUser.orElseThrow(() ->
+                new EntityNotFoundException("UserID doesn't exist"));
+        return foundUser;
     }
 
     public String getToken(User user){

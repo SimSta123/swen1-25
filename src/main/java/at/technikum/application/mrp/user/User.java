@@ -52,4 +52,12 @@ public class User {
 
     public List<String> getFavMedia() {return favMedia;}
 
+    public User(String username, String password, int id) {
+        this.username = username;
+        this.password = password;
+        this.id = id;
+    }
+
+    public User(){ }
+
 }
