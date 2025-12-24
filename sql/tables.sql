@@ -1,3 +1,14 @@
+-- Tabellen löschen, falls vorhanden
+DROP TABLE IF EXISTS rating_likes CASCADE;
+DROP TABLE IF EXISTS recommendations CASCADE;
+DROP TABLE IF EXISTS favorites CASCADE;
+DROP TABLE IF EXISTS ratings CASCADE;
+DROP TABLE IF EXISTS media_genres CASCADE;
+DROP TABLE IF EXISTS genres CASCADE;
+DROP TABLE IF EXISTS media CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS todos CASCADE;
+
 CREATE TABLE IF NOT EXISTS todos (
     id VARCHAR(36) PRIMARY KEY,
     description TEXT NOT NULL,
@@ -12,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS media(
-    title varchar(36),
+    title varchar(36) UNIQUE NOT NULL,
     description TEXT,
     mediaType TEXT CHECK (mediaType IN ('movie','series','game')),
     releaseYear INT,
@@ -28,9 +39,7 @@ CREATE TABLE genres (
     genreName TEXT UNIQUE NOT NULL
 );
 
--- ============================================
 -- MEDIA ↔ GENRES (n:m) (Ein media kann merere genre haben, mehrere media können gleiche genre haben
--- ============================================
 CREATE TABLE media_genres (
     id SERIAL PRIMARY KEY,
     mediaId INT NOT NULL REFERENCES media(mediaId) ON DELETE CASCADE,
@@ -67,9 +76,6 @@ CREATE TABLE recommendations (
     PRIMARY KEY (userId, recommendedMediaId)
 );
 
--- ============================================
 -- TRIGGERS / Notizen
--- ============================================
-
 -- 1. Update media.averagScore wen neues/edites rating
 -- 2. generete recommendations???

@@ -2,10 +2,12 @@ package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
+import at.technikum.application.mrp.user.User;
 import at.technikum.server.http.*;
 
 import javax.sound.midi.SysexMessage;
 import java.util.List;
+import java.util.Optional;
 
 
 public class MediaController extends Controller {
@@ -23,8 +25,8 @@ public class MediaController extends Controller {
 
         if (request.getMethod().equals(Method.GET.getVerb())) {
             if (request.getPath().equals("/api/media")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-                //return readAll();
+                //return json("doesn't exist yet",Status.NOT_FOUND);
+                return readAll();
             } else if (request.getPath().equals("/api/media/"+id)) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
                 //return read(id);
@@ -33,8 +35,8 @@ public class MediaController extends Controller {
             }
         } else if (request.getMethod().equals(Method.POST.getVerb())) {
             if (request.getPath().equals("/api/media")) {
-                //return create(request);
-                return json("doesnt exist yet", Status.NOT_FOUND);
+                return create(request);
+                //return json("doesnt exist yet", Status.NOT_FOUND);
             } else if(request.getPath().equals("/api/media"+id+"/favorite")) {
                 return json("doesnt exist yet", Status.NOT_FOUND);
             } else {
@@ -64,13 +66,13 @@ public class MediaController extends Controller {
     }
 
     private Response readAll() {
-        List<Media> media = mediaService.getAll();
+        Optional<Object> media = mediaService.getAll();
 
         text(media.toString());
         Response response = new Response();
         response.setStatus(Status.OK);
         response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody("Media");
+        response.setBody(media.toString());
         return response;
         //return text(media.toString());
     }
@@ -82,7 +84,13 @@ public class MediaController extends Controller {
     }
 
     private Response create(Request request) {
-
+        System.out.println("in MediaController");
+        try {
+            Media media = toObject(request.getBody(), Media.class);
+            mediaService.create(media);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
         return null;
     }
 

@@ -10,3 +10,5 @@ services:
     volumes:
       - swen1v:/var/lib/postgresql
 
+volumes:
+  swen1v:

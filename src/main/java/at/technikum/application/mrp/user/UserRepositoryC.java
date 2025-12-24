@@ -1,9 +1,6 @@
 package at.technikum.application.mrp.user;
 
 import at.technikum.application.common.ConnectionPool;
-import at.technikum.application.mrp.media.Media;
-import at.technikum.application.todo.model.Todo;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

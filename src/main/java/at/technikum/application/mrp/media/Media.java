@@ -22,33 +22,9 @@ public class Media {
     private double averageRating;
     private boolean isDone;
     private int mediaID;
+    private int creatorID;
     //private List<String> type;
 
-    /*
-    public boolean isMovie() {
-        return movie;
-    }
-
-    public void setMovie(boolean movie) {
-        this.movie = movie;
-    }
-
-    public boolean isSeries() {
-        return series;
-    }
-
-    public void setSeries(boolean series) {
-        this.series = series;
-    }
-
-    public boolean isGame() {
-        return game;
-    }
-
-    public void setGame(boolean game) {
-        this.game = game;
-    }
-    */
     public String getTitle() {
         return title;
     }
@@ -135,5 +111,22 @@ public class Media {
 
     public int getMediaID() {
         return mediaID;
+    }
+
+    public int getCreatorID() {return creatorID;}
+
+    public void setCreatorID(int creatorID) {
+        this.creatorID = creatorID;
+    }
+
+    public Media(){}
+
+    public Media(String title, String description, String mediaType, int releaseYear, int ageRestriction, int creatorID){
+        this.title = title;
+        this.description = description;
+        this.mediaType = mediaType;
+        this.releaseYear = releaseYear;
+        this.ageRestriction = ageRestriction;
+        this.creatorID = creatorID;
     }
 }

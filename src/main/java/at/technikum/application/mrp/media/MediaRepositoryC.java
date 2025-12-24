@@ -1,9 +1,11 @@
 package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.ConnectionPool;
+import at.technikum.application.mrp.user.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +16,25 @@ public class MediaRepositoryC implements MediaRepository {
     private final ConnectionPool connectionPool;
 
     private final String CREATE
-            = "INSERT INTO media (title, description, mediaType, releaseYear, ageRestriction) VALUES (?,?,?,?,?)";
+            = "INSERT INTO media (title, description, mediaType, releaseYear, ageRestriction, creator_id) VALUES (?,?,?,?,?,?)";
+
+    private final String CREATE_GENRES
+            = "INSERT INTO genres (genreName) VALUES (?) ON CONFLICT (genreName) DO NOTHING";   //mehrere gleiche GenreName können eingegeben werden, nicht passiert
+
+    private final String CREATE_GENRES_ASSOCIATED
+            = "INSERT INTO media_genres (mediaID,genreID) VALUES (?,?)";
 
     private final String DELETE_BY_ID
             = "DELETE FROM media WHERE id=?";
+
+    private final String GET_ALL
+            = "SELECT * FROM media";
+
+    private final String GET_GENRE_ID
+            = "SELECT * FROM genres WHERE genreName=?";
+
+    private final String GET_MEDIA_ID
+            = "SELECT * FROM media WHERE title=?";
 
     public MediaRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -30,27 +47,80 @@ public class MediaRepositoryC implements MediaRepository {
     }
 
     @Override
-    public List<Media> findAll() {
-        Media media = new Media();
-        media.setTitle("1");
+    public Optional<Object> findAll() {
         List<Media> medias = new ArrayList<>();
-        medias.add(media);
-        return medias;
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(GET_ALL)
+        ) {
+            ResultSet rs = pstmt.executeQuery();
+            while (!rs.next()) {
+                Media media = new Media(
+                        rs.getString("title"),
+                        rs.getString("Description"),
+                        rs.getString("MediaType"),
+                        Integer.parseInt(rs.getString("releaseYear")),
+                                Integer.parseInt(rs.getString("ageRestriction")),
+                                        Integer.parseInt(rs.getString("creator_id"))
+                                );
+
+                        medias.add(media);
+            }
+
+            return Optional.of(medias);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Media save(Media media) {
         try (
                 Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt_2 = conn.prepareStatement(CREATE_GENRES);
+                PreparedStatement pstmt_3 = conn.prepareStatement(CREATE_GENRES_ASSOCIATED);
+                PreparedStatement pstmt_GENREID = conn.prepareStatement(GET_GENRE_ID);
+                PreparedStatement pstmt_MEDIAID = conn.prepareStatement(GET_MEDIA_ID);
+
         ) {
-            System.out.println("trying to save user");
+            System.out.println("trying to save media");
             try (PreparedStatement pstmt = conn.prepareStatement(CREATE)) {
                 pstmt.setString(1, media.getTitle());
                 pstmt.setString(2, media.getDescription());
                 pstmt.setString(3, media.getMediaType());
                 pstmt.setInt(4, media.getReleaseYear());
                 pstmt.setInt(5, media.getAgeRestriction());
+                pstmt.setInt(6, media.getCreatorID());
                 pstmt.executeUpdate();
+                System.out.println("--------pstmt ausgeführt---------");
+
+                pstmt_MEDIAID.setString(1, media.getTitle());
+                int mediaID = 0;
+                ResultSet rs = pstmt_MEDIAID.executeQuery();
+                if (rs.next()) {
+                    mediaID = rs.getInt("mediaID");
+                }
+
+                String[] genres = media.getGenre().toArray(new String[0]);
+                for(int i = 0; i < genres.length; i++) {
+                    pstmt_2.setString(1,genres[i]);
+                    pstmt_2.executeUpdate();
+
+                    System.out.println("--------pstmt_2 ausgeführt---------");
+
+                    pstmt_GENREID.setString(1, genres[i]);
+                    int genreID = 0;
+                    rs = pstmt_GENREID.executeQuery();
+                    if (rs.next()) {
+                        genreID = rs.getInt("id");
+                    }
+                    pstmt_3.setInt(1,mediaID);
+                    pstmt_3.setInt(2,genreID);
+                    pstmt_3.executeUpdate();
+
+                    System.out.println("--------pstmt_3 ausgeführt---------");
+
+                }
                 System.out.println("Database Saved");
                 return media;
             }

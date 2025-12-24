@@ -2,6 +2,7 @@ package at.technikum.application.mrp.media;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 public class MediaService {
 
@@ -13,6 +14,7 @@ public class MediaService {
 
     public Media create(Media media) {
         // is todo valid?
+        System.out.println("in MediaService");
         media.setTitle(media.getTitle());
 
         return mediaRepository.save(media);
@@ -23,7 +25,7 @@ public class MediaService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
-    public List<Media> getAll() {
+    public Optional<Object> getAll() {
         return mediaRepository.findAll();
     }
 
