@@ -1,4 +1,4 @@
-package at.technikum.Task5;
+package TheorieFr.FragenTeil4.Task5;
 
 import java.util.List;
 

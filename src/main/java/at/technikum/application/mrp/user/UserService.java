@@ -17,6 +17,13 @@ public class UserService {
         this.auth = new AuthService();
     }
 
+    //zum Testen
+    public UserService() {
+        this.userRepository = null;
+        this.users = new ArrayList<>();
+        this.auth = new AuthService();
+    }
+
     public User create(User user) {
         // is user valid?
         System.out.println("try to create");
@@ -31,12 +38,13 @@ public class UserService {
         user.setUUId(UUID.randomUUID().toString());
         user.setId(users.size()+1);
         user.setDone(true);
-        //UUID uuid = UUID.randomUUID();
-        //user.setUUId(uuid.toString());
+        UUID uuid = UUID.randomUUID();
+        user.setUUId(uuid.toString());
         users.add(user);
-        Optional<User> optionalUser = userRepository.save(user);
-        User savedUser = optionalUser.get();
-        return savedUser;
+        //Optional<User> optionalUser = userRepository.save(user);
+        //User savedUser = optionalUser.get();
+        //return savedUser;
+        return user;
     }
 
     public User get(String id) {
@@ -108,12 +116,12 @@ public class UserService {
     }
 
     public User findByID(int id) {
-        /*
+
         return users.stream()
                 .filter(u -> u.getId() == id)
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("UserID not found"));
-         */
+
         /*for(User u : users){
             System.out.println(u.getId()+"-----------------");
             if(u.getId() == id){
@@ -121,10 +129,12 @@ public class UserService {
             }
         }
          */
+        /*
         Optional<User> optionalUser = userRepository.find(String.valueOf(id));
         User foundUser = optionalUser.orElseThrow(() ->
                 new EntityNotFoundException("UserID doesn't exist"));
         return foundUser;
+        */
     }
 
     public String getToken(User user){
