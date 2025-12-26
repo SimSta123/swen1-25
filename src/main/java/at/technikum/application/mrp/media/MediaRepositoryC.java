@@ -1,6 +1,7 @@
 package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.ConnectionPool;
+import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.user.User;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
@@ -43,17 +44,26 @@ public class MediaRepositoryC implements MediaRepository {
     private final String UPDATE_MEDIA
             = "UPDATE media SET title = ?, description = ?, mediaType = ?, releaseYear = ?, ageRestriction = ? WHERE mediaID = ? AND creator_id = ?";
 
+    private final String CREATE_RATING
+            = "INSERT INTO ratings (userId, mediaID, rating, comment, commentconfirmed) VALUES (?,?,?,?,?)";
+
+    public final String RATING_EXISTS
+            = "SELECT * from ratings WHERE mediaId = ? AND userId = ?";
+
+    public final String ALL_RATINGS
+            = "SELECT rating FROM ratings WHERE mediaId = ?";
+
     public MediaRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
-
 
     @Override
     public Optional<Media> find(int id) {
         System.out.println("media_find:"+id);
         try (
                 Connection conn = connectionPool.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(GET_MEDIA_WHERE_ID)
+                PreparedStatement pstmt = conn.prepareStatement(GET_MEDIA_WHERE_ID);
+                PreparedStatement pstmt_2 = conn.prepareStatement(ALL_RATINGS)
         ) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -67,6 +77,20 @@ public class MediaRepositoryC implements MediaRepository {
                         rs.getInt("creator_id"),
                         rs.getInt("mediaID")
                 );
+                pstmt_2.setInt(1,id);
+                rs = pstmt_2.executeQuery();
+                double count = 0;
+                int rating = 0;
+                while(rs.next()){
+                    //media.setAverageRating(rs.getInt("rating"));
+                    rating += rs.getInt("rating");
+                    System.out.println("score:" +rating+" count: "+count);
+                    count++;
+                }
+                if(count>0&&rating>0){
+                    media.setAverageRating(media.getAverageRating()/count);
+                    media.setAverageRating(rating/count);
+                }
                 return Optional.of(media);
             } else {
                 return Optional.empty(); // nichts gefunden
@@ -207,6 +231,41 @@ public class MediaRepositoryC implements MediaRepository {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    public boolean saveRating(Rating rating, int mediaId) {
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(CREATE_RATING);
+        ) {
+            pstmt.setInt(1, rating.getCreatorId());
+            pstmt.setInt(2, mediaId);
+            pstmt.setInt(3, rating.getStars());
+            pstmt.setString(4, rating.getComment());
+            pstmt.setBoolean(5,rating.isConfirmed());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public boolean ratingExists(int mediaId, int userId) {
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(RATING_EXISTS);
+        ) {
+            pstmt.setInt(1, mediaId);
+            pstmt.setInt(2, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

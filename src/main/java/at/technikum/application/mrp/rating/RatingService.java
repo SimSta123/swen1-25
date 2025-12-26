@@ -13,11 +13,12 @@ public class RatingService {
         this.ratingRepository = ratingRepository;
     }
 
-    public Rating create(Rating rating) {
+    public boolean create(Rating rating, int mediaId) {
         // is todo valid?
-        rating.setRating(rating.getRating());
+        //rating.setRating(rating.getRating());
 
-        return ratingRepository.save(rating);
+
+        return ratingRepository.save(rating, mediaId);
     }
 
     public Rating get(String id) {
@@ -37,7 +38,8 @@ public class RatingService {
         //rating.setTitle(update.getTitle());
         //rating.setDone(update.isDone());
 
-        return ratingRepository.save(rating);
+        //return ratingRepository.save(rating, 0);
+        return rating;
     }
 
     public Rating delete(String title) {

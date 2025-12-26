@@ -30,7 +30,7 @@ public class MRPApplication implements Application {
 
         router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool))));
         router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool))));
-        router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC())));
+        router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC(connectionPool))));
         router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC())));
 
 

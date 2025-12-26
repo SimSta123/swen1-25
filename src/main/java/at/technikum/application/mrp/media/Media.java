@@ -19,7 +19,7 @@ public class Media {
     private int ageRestriction;
     private String creatorUUID;
     private List<Rating> rating;
-    private double averageRating;
+    private double averageRating = 0.0;
     private boolean isDone;
     private int mediaID;
     private int creatorID;
@@ -138,6 +138,7 @@ public class Media {
         this.ageRestriction = ageRestriction;
         this.creatorID = creatorID;
         this.mediaID = mediaID;
+        this.averageRating = 0.0;
     }
 
     @Override
@@ -150,6 +151,7 @@ public class Media {
                 ", ageRestriction=" + ageRestriction +
                 ", creatorID=" + creatorID +
                 ", mediaID=" + mediaID +
+                ", averageRating=" + averageRating +
                 '}';
     }
 }

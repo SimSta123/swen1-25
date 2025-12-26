@@ -9,7 +9,7 @@ public interface RatingRepository {
 
     List<Rating> findAll();
 
-    Rating save(Rating user);
+    boolean save(Rating user, int userId);
 
     // Todo update(Todo todo);
 

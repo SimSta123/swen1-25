@@ -26,8 +26,8 @@ public class RatingController extends Controller {
 
         if (request.getMethod().equals(Method.POST.getVerb())) {
             if (request.getPath().equals("/api/ratings/"+id+"/rate")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-                //return create(request);
+                //return json("doesn't exist yet",Status.NOT_FOUND);
+                return create(request,id);
             }
             if (request.getPath().equals("/api/ratings/"+id+"/like")) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
@@ -73,8 +73,14 @@ public class RatingController extends Controller {
 
     }
 
-    private Response create(Request request) {
-
+    private Response create(Request request, int mediaId) {
+        //Später ändern das der aktuelle Authenthifizierte user genommen wird
+        try{
+            Rating rating = toObject(request.getBody(), Rating.class);
+            boolean done = ratingService.create(rating, mediaId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 

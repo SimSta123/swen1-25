@@ -2,11 +2,14 @@ package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
+import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.user.User;
+import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.server.http.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.sound.midi.SysexMessage;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,8 +42,10 @@ public class MediaController extends Controller {
             if (request.getPath().equals("/api/media")) {
                 return create(request);
                 //return json("doesnt exist yet", Status.NOT_FOUND);
-            } else if(request.getPath().equals("/api/media"+id+"/favorite")) {
+            } else if(request.getPath().equals("/api/media/"+id+"/favorite")) {
                 return json("doesnt exist yet", Status.NOT_FOUND);
+            } else if(request.getPath().equals("/api/media/"+id+"/rate")) {
+                return rate(request,id);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
@@ -89,20 +94,18 @@ public class MediaController extends Controller {
     }
 
     private Response read(int id) {
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+
         try {
             Media media = mediaService.get(id);
 
-            Response response = new Response();
-            //response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
+            response.setStatus(Status.OK);
             response.setBody(media.toString());
-
             return json(response, Status.OK);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            Response response = new Response();
-            //response.setStatus(Status.NOT_FOUND);
-            response.setContentType(ContentType.TEXT_PLAIN);
+            response.setStatus(Status.NOT_FOUND);
             response.setBody(e.getMessage());
             return json(response, Status.NOT_FOUND);
         }
@@ -111,14 +114,20 @@ public class MediaController extends Controller {
 
     private Response create(Request request) {
         System.out.println("in MediaController");
-        Media media = toObject(request.getBody(), Media.class);
-        mediaService.create(media);
-        System.out.println("after save");
         Response response = new Response();
-        response.setStatus(Status.OK);
         response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody("done");
-        return json(response, Status.OK);
+        try {
+            Media media = toObject(request.getBody(), Media.class);
+            mediaService.create(media);
+            System.out.println("after save");
+            response.setStatus(Status.OK);
+            response.setBody("done");
+            return json(response, Status.OK);
+        } catch (Exception e){
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
+            return json(response,Status.BAD_REQUEST);
+        }
     }
 
     private Response update(Request request, int id) {
@@ -165,6 +174,31 @@ public class MediaController extends Controller {
             Response response = new Response();
             response.setStatus(Status.OK);
             response.setContentType(ContentType.TEXT_PLAIN);
+            response.setBody(e.getMessage());
+            System.out.println(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
+        }
+    }
+
+    //Hier oder im RatingService??
+    private Response rate(Request request, int mediaId) {
+        //Später ändern das der aktuelle Authenthifizierte user genommen wird
+
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            Rating rating = toObject(request.getBody(), Rating.class);
+            boolean done = mediaService.createRating(rating, mediaId);
+            response.setBody("done: "+done+", rating on mediaId: "+mediaId);
+            //response.setStatus(Status.CREATED);
+            return json(response,Status.OK);
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
             response.setBody(e.getMessage());
             System.out.println(e.getMessage());
             return json(response, Status.BAD_REQUEST);

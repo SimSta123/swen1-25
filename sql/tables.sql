@@ -51,7 +51,7 @@ CREATE TABLE ratings (
     id SERIAL PRIMARY KEY,
     userId INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     mediaId INT NOT NULL REFERENCES media(mediaId) ON DELETE CASCADE,
-    rating INT CHECK (rating BETWEEN 1 AND 5),
+    rating INT CHECK (rating BETWEEN 1 AND 5) NOT NULL,
     comment TEXT,
     commentConfirmed BOOLEAN DEFAULT FALSE,
     UNIQUE (userId, mediaId) -- ein rating pro user pro media

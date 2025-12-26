@@ -5,7 +5,7 @@ import java.util.regex.*;
 public class UrlID {
 
     public static int urlID(String path) {
-
+        System.out.println(path);
         // Falls Query-Parameter vorhanden sind -> abschneiden
         path = path.split("\\?")[0];
 

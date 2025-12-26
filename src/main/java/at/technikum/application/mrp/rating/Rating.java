@@ -7,12 +7,12 @@ import java.util.List;
 public class Rating {
     private int id;
     private Media media;
-    private int rating;
+    private int stars;
     private String comment;
     private String timeStamp;
     private List<Integer> like;
     private int creatorID;
-    private boolean confirmed;
+    private boolean confirmed = false;;
 
     public Rating() {}
 
@@ -28,12 +28,10 @@ public class Rating {
         this.media = media;
     }
 
-    public int getRating() {
-        return rating;
-    }
+    public int getStars() {return stars;}
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setStars(int stars) {
+        this.stars = stars;
     }
 
     public String getComment() {
@@ -60,11 +58,11 @@ public class Rating {
         like.addAll(like);
     }
 
-    public int getCreator() {
+    public int getCreatorId() {
         return creatorID;
     }
 
-    public void setCreator(int creator) {
+    public void setCreatorId(int creator) {
         this.creatorID = creator;
     }
 

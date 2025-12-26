@@ -1,4 +1,6 @@
 package at.technikum.application.mrp.media;
+import at.technikum.application.mrp.rating.Rating;
+import at.technikum.application.mrp.rating.RatingService;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import java.util.List;
@@ -16,6 +18,12 @@ public class MediaService {
         // is todo valid?
         System.out.println("in MediaService");
         //media.setTitle(media.getTitle()); //wieso????? woher wie wo was??
+        /*  //Falls media einzigartig sein soll
+        mediaRepository.find(media.getMediaID())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Media with ID " + mediaId + " not found")
+                );
+         */
 
         return mediaRepository.save(media);
     }
@@ -64,5 +72,21 @@ public class MediaService {
             mediaRepository.delete(mediaId);
             return true;
         }
+    }
+    //Hier oder im Ratingservice?
+    public boolean createRating(Rating rating, int mediaId) {
+        // is todo valid?
+        //rating.setRating(rating.getRating());
+
+        mediaRepository.find(mediaId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Media with ID " + mediaId + " not found")
+                );
+
+        if(mediaRepository.ratingExists(mediaId, rating.getCreatorId())){
+            throw new EntityNotFoundException("Rating already exists");
+        }
+        System.out.println("media found and rating not found");
+        return mediaRepository.saveRating(rating, mediaId);
     }
 }
