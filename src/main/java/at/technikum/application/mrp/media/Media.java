@@ -129,4 +129,28 @@ public class Media {
         this.ageRestriction = ageRestriction;
         this.creatorID = creatorID;
     }
+
+    public Media(String title, String description, String mediaType, int releaseYear, int ageRestriction, int creatorID, int mediaID){
+        this.title = title;
+        this.description = description;
+        this.mediaType = mediaType;
+        this.releaseYear = releaseYear;
+        this.ageRestriction = ageRestriction;
+        this.creatorID = creatorID;
+        this.mediaID = mediaID;
+    }
+
+    @Override
+    public String toString() {
+        return "Media{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", mediaType='" + mediaType + '\'' +
+                ", releaseYear=" + releaseYear +
+                ", ageRestriction=" + ageRestriction +
+                ", creatorID=" + creatorID +
+                ", mediaID=" + mediaID +
+                '}';
+    }
 }
+

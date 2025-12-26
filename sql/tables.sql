@@ -1,13 +1,13 @@
 -- Tabellen löschen, falls vorhanden
-DROP TABLE IF EXISTS rating_likes CASCADE;
-DROP TABLE IF EXISTS recommendations CASCADE;
-DROP TABLE IF EXISTS favorites CASCADE;
-DROP TABLE IF EXISTS ratings CASCADE;
-DROP TABLE IF EXISTS media_genres CASCADE;
-DROP TABLE IF EXISTS genres CASCADE;
-DROP TABLE IF EXISTS media CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS todos CASCADE;
+--DROP TABLE IF EXISTS rating_likes CASCADE;
+--DROP TABLE IF EXISTS recommendations CASCADE;
+--DROP TABLE IF EXISTS favorites CASCADE;
+--DROP TABLE IF EXISTS ratings CASCADE;
+--DROP TABLE IF EXISTS media_genres CASCADE;
+--DROP TABLE IF EXISTS genres CASCADE;
+--DROP TABLE IF EXISTS media CASCADE;
+--DROP TABLE IF EXISTS users CASCADE;
+--DROP TABLE IF EXISTS todos CASCADE;
 
 CREATE TABLE IF NOT EXISTS todos (
     id VARCHAR(36) PRIMARY KEY,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS media(
-    title varchar(36) UNIQUE NOT NULL,
+    title varchar(36) NOT NULL,
     description TEXT,
     mediaType TEXT CHECK (mediaType IN ('movie','series','game')),
     releaseYear INT,

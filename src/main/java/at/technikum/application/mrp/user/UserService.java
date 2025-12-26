@@ -38,13 +38,12 @@ public class UserService {
         user.setUUId(UUID.randomUUID().toString());
         user.setId(users.size()+1);
         user.setDone(true);
-        UUID uuid = UUID.randomUUID();
-        user.setUUId(uuid.toString());
+        //UUID uuid = UUID.randomUUID();
+        //user.setUUId(uuid.toString());
         users.add(user);
-        //Optional<User> optionalUser = userRepository.save(user);
-        //User savedUser = optionalUser.get();
-        //return savedUser;
-        return user;
+        Optional<User> optionalUser = userRepository.save(user);
+        User savedUser = optionalUser.get();
+        return savedUser;
     }
 
     public User get(String id) {
