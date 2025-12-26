@@ -93,17 +93,16 @@ public class MediaRepositoryC implements MediaRepository {
                         Integer.parseInt(rs.getString("releaseYear")),
                         Integer.parseInt(rs.getString("ageRestriction")),
                         Integer.parseInt(rs.getString("creator_id")),
-                        Integer.parseInt("mediaID")
+                        Integer.parseInt(rs.getString("mediaID"))
                 );
                 System.out.println(media.toString());
                 medias.add(media);
             }
             return medias;
         } catch (SQLException e) {
-            //throw new RuntimeException(e);
             System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
-        return medias;
     }
 
     @Override

@@ -13,8 +13,8 @@ public class UserService {
 
     public UserService(UserRepositoryC userRepositoryC) {
         this.userRepository = userRepositoryC;
-        this.users = new ArrayList<>();
-        this.auth = new AuthService();
+        //this.users = new ArrayList<>();
+        //this.auth = new AuthService();
     }
 
     //zum Testen

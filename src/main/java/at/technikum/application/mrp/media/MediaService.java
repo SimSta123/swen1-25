@@ -22,7 +22,9 @@ public class MediaService {
 
     public Media get(int id) {
         return mediaRepository.find(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Media with ID " + id + " not found")
+                );
     }
 
     public List<Media> getAll() {

@@ -4,6 +4,7 @@ import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.user.User;
 import at.technikum.server.http.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.sound.midi.SysexMessage;
 import java.util.List;
@@ -29,8 +30,8 @@ public class MediaController extends Controller {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
                 return readAll();
             } else if (request.getPath().equals("/api/media/"+id)) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-                //return read(id);
+                //return json("doesn't exist yet",Status.NOT_FOUND);
+                return read(id);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
@@ -67,23 +68,44 @@ public class MediaController extends Controller {
     }
 
     private Response readAll() {
-        List<Media> media = mediaService.getAll();
+        try {
+            List<Media> media = mediaService.getAll();
+            Response response = new Response();
+            response.setStatus(Status.OK);
+            //response.setContentType(ContentType.TEXT_PLAIN);
+            response.setContentType(ContentType.APPLICATION_JSON);
+            //????
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(media);
+            response.setBody(jsonBody);
 
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody(
-                media.stream()
-                        .map(Media::toString)
-                        .collect(Collectors.joining("\n"))
-        );
-        return json(response, Status.OK);
+            return json(response, Status.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
         //return text(media.toString());
     }
 
     private Response read(int id) {
-        //Optional<Object> media = mediaService.get(id);
-        return null;
+        try {
+            Media media = mediaService.get(id);
+
+            Response response = new Response();
+            //response.setStatus(Status.OK);
+            response.setContentType(ContentType.TEXT_PLAIN);
+            response.setBody(media.toString());
+
+            return json(response, Status.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            Response response = new Response();
+            //response.setStatus(Status.NOT_FOUND);
+            response.setContentType(ContentType.TEXT_PLAIN);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        }
 
     }
 
