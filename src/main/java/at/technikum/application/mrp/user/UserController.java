@@ -3,6 +3,7 @@ package at.technikum.application.mrp.user;
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.authentification.AuthService;
+import at.technikum.application.mrp.media.Media;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
@@ -42,7 +43,7 @@ public class UserController extends Controller {
                 return ratingHistory(UrlID.urlID(request.getPath()));
             }
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/favorites")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
+                return getFav(UrlID.urlID((request.getPath())));
             }
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/recommendations")) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
@@ -206,6 +207,37 @@ public class UserController extends Controller {
             response.setStatus(Status.BAD_REQUEST);
             response.setBody("err: "+e.getMessage());
             return json(e.getMessage(), Status.BAD_REQUEST);
+        }
+    }
+
+    public Response getFav(int userId){
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            List<Media> media = userService.getAllFavs(userId);
+            response.setStatus(Status.OK);
+            //response.setContentType(ContentType.TEXT_PLAIN);
+            response.setContentType(ContentType.APPLICATION_JSON);
+            //????
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(media);
+            response.setBody(jsonBody);
+            return json(response, Status.OK);
+        } catch (EntityNotFoundException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody(e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
         }
     }
 }

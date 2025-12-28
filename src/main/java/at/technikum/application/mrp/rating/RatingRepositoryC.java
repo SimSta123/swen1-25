@@ -2,10 +2,8 @@ package at.technikum.application.mrp.rating;
 
 import at.technikum.application.common.ConnectionPool;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,7 @@ public class RatingRepositoryC implements RatingRepository{
     private final ConnectionPool connectionPool;
 
     private final String CREATE_RATING
-            = "INSERT INTO ratings (userId, mediaID, rating, comment, created_at, commentconfirmed) VALUES (?,?,?,?,?)";
+            = "INSERT INTO ratings (userId, mediaID, rating, comment, created_at, commentconfirmed) VALUES (?,?,?,?,?,?)";
 
     private final String FIND_BY_ID
             = "SELECT * FROM ratings WHERE id = ? ";
@@ -55,7 +53,7 @@ public class RatingRepositoryC implements RatingRepository{
                 rating.setMediaId(rs.getInt("mediaId"));
                 rating.setStars(rs.getInt("rating"));
                 rating.setComment(rs.getString("comment"));
-                rating.setTimeStamp(rs.getTimestamp("created_at"));
+                rating.setTimeStamp(rs.getTimestamp("created_at").toString());
                 rating.setConfirmed(rs.getBoolean("commentconfirmed"));
                 return Optional.of(rating);
             } else {
@@ -83,7 +81,7 @@ public class RatingRepositoryC implements RatingRepository{
                 rating.setMediaId(rs.getInt("mediaId"));
                 rating.setStars(rs.getInt("rating"));
                 rating.setComment(rs.getString("comment"));
-                rating.setTimeStamp(rs.getTimestamp("created_at"));
+                rating.setTimeStamp(rs.getTimestamp("created_at").toString());
                 rating.setConfirmed(rs.getBoolean("commentconfirmed"));
                 ratingList.add(rating);
             }
@@ -104,7 +102,8 @@ public class RatingRepositoryC implements RatingRepository{
             pstmt.setInt(2, mediaId);
             pstmt.setInt(3, rating.getStars());
             pstmt.setString(4, rating.getComment());
-            pstmt.setBoolean(5,rating.isConfirmed());
+            pstmt.setTimestamp(5, Timestamp.valueOf(rating.getTimeStamp()));
+            pstmt.setBoolean(6,rating.isConfirmed());
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {

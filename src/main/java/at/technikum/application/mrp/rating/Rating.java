@@ -3,6 +3,7 @@ package at.technikum.application.mrp.rating;
 import at.technikum.application.mrp.media.Media;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Rating {
@@ -11,7 +12,7 @@ public class Rating {
     private int mediaId;
     private int stars;
     private String comment;
-    private Timestamp timeStamp;
+    private String timeStamp;
     private List<Integer> like;
     private int creatorID;
     private boolean confirmed = false;
@@ -46,11 +47,11 @@ public class Rating {
         this.comment = comment;
     }
 
-    public Timestamp getTimeStamp() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Timestamp timeStamp) {
+    public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
 

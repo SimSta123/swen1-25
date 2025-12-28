@@ -1,6 +1,7 @@
 package at.technikum.application.mrp.user;
 
 import at.technikum.application.common.ConnectionPool;
+import at.technikum.application.mrp.media.Media;
 import at.technikum.application.mrp.rating.Rating;
 
 import javax.sound.midi.SysexMessage;
@@ -8,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +17,6 @@ import java.util.Optional;
 public class UserRepositoryC implements UserRepository {
 
     private final ConnectionPool connectionPool;
-
-    /*
-    private static final String CREATE
-            = "INSERT INTO users (username, password, uuid) VALUES (?,?,?)";
-     */
 
     private String SELECT_BY_ID
             = "SELECT * FROM users WHERE id = ?";
@@ -36,6 +33,18 @@ public class UserRepositoryC implements UserRepository {
 
     private final String FIND_BY_USER_ID
             = "SELECT * FROM ratings WHERE userId = ? ORDER BY created_at DESC";
+
+    private final String FAVS_BY_USER_ID
+            = "SELECT mediaId FROM favorites WHERE userId = ?";
+
+    private final String GET_ALL_MEDIA_WHERE
+            = "SELECT * FROM media WHERE mediaID = ?";
+
+    private final String GET_GENRES_ID
+            = "SELECT genreId FROM media_genres WHERE mediaId = ?";
+
+    private final String GET_GENRE_NAME
+            = "SELECT genreName FROM genres WHERE id = ?";
 
     public UserRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -98,26 +107,6 @@ public class UserRepositoryC implements UserRepository {
 
     @Override
     public Optional<User> save(User user) {
-        /*
-        try (
-                Connection conn = connectionPool.getConnection();
-        ) {
-            System.out.println("trying to save user");
-            try (PreparedStatement pstmt = conn.prepareStatement(CREATE)) {
-                //pstmt.setInt(1, user.getId());
-                pstmt.setString(1, user.getUsername());
-                pstmt.setString(2, user.getPassword());
-                pstmt.setString(3, user.getUUId());
-                pstmt.executeUpdate();
-                System.out.println("Database Saved");
-                return Optional.of(user);
-            }
-
-        } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-        }
-         */
         return null;
     }
 
@@ -178,7 +167,7 @@ public class UserRepositoryC implements UserRepository {
                 rating.setMediaId(rs.getInt("mediaId"));
                 rating.setStars(rs.getInt("rating"));
                 rating.setComment(rs.getString("comment"));
-                rating.setTimeStamp(rs.getTimestamp("created_at"));
+                rating.setTimeStamp(rs.getTimestamp("created_at").toString());
                 rating.setConfirmed(rs.getBoolean("commentconfirmed"));
                 System.out.println(rating.toString());
                 ratingList.add(rating);
@@ -189,5 +178,73 @@ public class UserRepositoryC implements UserRepository {
             throw new RuntimeException(e.getMessage());
         }
 
+    }
+
+    public List<Integer> allFavsMediaId(int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FAVS_BY_USER_ID);
+                ){
+            System.out.println("A");
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            List<Integer> mIds = new ArrayList<>();
+            while (rs.next()) {
+                System.out.println("B");
+                mIds.add(rs.getInt("mediaId"));
+                System.out.println("C");
+            }
+            return mIds;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public Media findMediaByID(int mediaId) {
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(GET_ALL_MEDIA_WHERE);
+                PreparedStatement pstmt_2 = conn.prepareStatement(GET_GENRES_ID);
+                PreparedStatement pstmt_3 = conn.prepareStatement(GET_GENRE_NAME)
+        ) {
+            System.out.println("D");
+            pstmt.setInt(1, mediaId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Media media = new Media(
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("mediaType"),
+                        Integer.parseInt(rs.getString("releaseYear")),
+                        Integer.parseInt(rs.getString("ageRestriction")),
+                        Integer.parseInt(rs.getString("creator_id")),
+                        Integer.parseInt(rs.getString("mediaID"))
+                );
+
+                System.out.println("E");
+                pstmt_2.setInt(1, mediaId);
+                ResultSet mediaGenres = pstmt_2.executeQuery();
+                List<String> genres = new ArrayList<>();
+                while(mediaGenres.next()){
+                    pstmt_3.setInt(1, mediaGenres.getInt("genreId"));
+                    ResultSet genreNames = pstmt_3.executeQuery();
+                    //genres.add(genreNames.getString("genreName"));
+                    if (genreNames.next()) {
+                        genres.add(genreNames.getString("genreName"));
+                    }
+                    genreNames.close();
+                }
+                media.setGenre(genres);
+                return media;
+            }
+            return null;
+
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }

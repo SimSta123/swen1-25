@@ -2,6 +2,8 @@ package at.technikum.application.mrp.user;
 
 import at.technikum.application.mrp.authentification.AuthRepositoryC;
 import at.technikum.application.mrp.authentification.AuthService;
+import at.technikum.application.mrp.media.Media;
+import at.technikum.application.mrp.media.MediaService;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.todo.exception.*;
 
@@ -117,6 +119,22 @@ public class UserService {
 
     public String getToken(User user){
         return auth.getToken(user.getUsername());
+    }
+
+    public List<Media> getAllFavs(int userId){
+        List<Media> favs = new ArrayList<>();
+        List<Integer> mIds = userRepository.allFavsMediaId(userId);
+        if(!mIds.isEmpty()){
+            System.out.println("before for");
+            for(int i = 0; i<mIds.toArray().length;i++) {
+                //favs = userRepository.findAllMediaByID();
+                favs.add(userRepository.findMediaByID(mIds.get(i)));
+                System.out.println("i");
+            }
+        } else {
+            throw new EntityNotFoundException("Keine Favs gefunden von diesem User");
+        }
+        return favs;
     }
 }
 

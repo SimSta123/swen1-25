@@ -4,3 +4,4 @@ SELECT * FROM genres
 SELECT * FROM media_genres
 SELECT * FROM ratings
 SELECT * FROM rating_likes
+SELECT * FROM favorites

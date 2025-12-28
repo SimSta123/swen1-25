@@ -48,11 +48,22 @@ public class MediaRepositoryC implements MediaRepository {
     private final String CREATE_RATING
             = "INSERT INTO ratings (userId, mediaID, rating, comment, commentconfirmed) VALUES (?,?,?,?,?)";
 
-    public final String RATING_EXISTS
+    private final String RATING_EXISTS
             = "SELECT * from ratings WHERE mediaId = ? AND userId = ?";
 
-    public final String ALL_RATINGS
+    private final String ALL_RATINGS
             = "SELECT rating FROM ratings WHERE mediaId = ?";
+
+    private final String FAV
+            = "INSERT INTO favorites (mediaId, userId) VALUES (?,?)";
+
+    private final String FAV_DELETE
+            = "DELETE FROM favorites WHERE mediaId = ? AND userId = ?";
+
+    private final String FAV_EXISTST
+            = "SELECT * FROM favorites WHERE mediaId = ? AND userId = ?";
+
+
 
     public MediaRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -268,6 +279,52 @@ public class MediaRepositoryC implements MediaRepository {
         try (
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(RATING_EXISTS);
+        ) {
+            pstmt.setInt(1, mediaId);
+            pstmt.setInt(2, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public boolean fav(int mediaId, int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FAV);
+        ) {
+            pstmt.setInt(1, mediaId);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public boolean favDelete(int mediaId, int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FAV_DELETE);
+        ) {
+            pstmt.setInt(1, mediaId);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public boolean favExists(int mediaId, int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FAV_EXISTST);
         ) {
             pstmt.setInt(1, mediaId);
             pstmt.setInt(2, userId);

@@ -44,7 +44,7 @@ public class MediaController extends Controller {
                 return create(request);
                 //return json("doesnt exist yet", Status.NOT_FOUND);
             } else if(request.getPath().equals("/api/media/"+id+"/favorite")) {
-                return json("doesnt exist yet", Status.NOT_FOUND);
+                return fav(id);
             } else if(request.getPath().equals("/api/media/"+id+"/rate")) {
                 return rate(request,id);
             } else {
@@ -64,8 +64,8 @@ public class MediaController extends Controller {
             if (request.getPath().equals("/api/media/"+id)) {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
                 return delete(request, id);
-            } if(request.getPath().equals("/api/media"+id+"/favorite")) {
-                return json("doesnt exist yet", Status.NOT_FOUND);
+            } if(request.getPath().equals("/api/media/"+id+"/favorite")) {
+                return favDelete(id);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
@@ -196,8 +196,8 @@ public class MediaController extends Controller {
             Rating rating = toObject(request.getBody(), Rating.class);
             boolean done = mediaService.createRating(rating, mediaId);
             response.setBody("done: "+done+", rating on mediaId: "+mediaId);
-            //response.setStatus(Status.CREATED);
-            return json(response,Status.OK);
+            response.setStatus(Status.CREATED);
+            return json(response,Status.CREATED);
         } catch (EntityNotFoundException e) {
             System.out.println(e.getMessage());
             response.setStatus(Status.NOT_FOUND);
@@ -207,6 +207,65 @@ public class MediaController extends Controller {
             response.setStatus(Status.BAD_REQUEST);
             response.setBody(e.getMessage());
             System.out.println(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
+        }
+    }
+
+    public Response fav(int mediaId){
+        int userId = 1;
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            boolean done = mediaService.fav(mediaId, userId);
+            response.setBody("done: "+done+", like on mediaId: "+mediaId);
+            response.setStatus(Status.CREATED);
+            return json(response,Status.CREATED);
+        } catch (EntityNotFoundException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (DuplicateAlreadyExistsException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.CONFLICT);
+            response.setBody(e.getMessage());
+            return json(response, Status.CONFLICT);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody(e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
+        }
+    }
+
+    public Response favDelete(int mediaId){
+        int userId = 1;
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            boolean done = mediaService.favDelete(mediaId, userId);
+            response.setBody("done: "+done+", deleted like on mediaId: "+mediaId);
+            response.setStatus(Status.OK);
+            return json(response,Status.OK);
+        } catch (EntityNotFoundException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody(e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
             return json(response, Status.BAD_REQUEST);
         }
     }

@@ -90,4 +90,32 @@ public class MediaService {
         System.out.println("media found and rating not found");
         return mediaRepository.saveRating(rating, mediaId);
     }
+
+    public boolean fav(int mediaId, int userId){
+        mediaRepository.find(mediaId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Media with ID " + mediaId + " not found")
+                );
+        System.out.println("1");
+
+        if(mediaRepository.favExists(mediaId, userId)){
+            throw new DuplicateAlreadyExistsException("Fav with the given params already exists");
+        }
+        System.out.println("2");
+
+        return mediaRepository.fav(mediaId, userId);
+    }
+
+    public boolean favDelete(int mediaId, int userId){
+        mediaRepository.find(mediaId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Media with ID " + mediaId + " not found")
+                );
+
+        if(!mediaRepository.favExists(mediaId, userId)){
+            throw new DuplicateAlreadyExistsException("Fav with the given params doesnt exist");
+        }
+
+        return mediaRepository.favDelete(mediaId, userId);
+    }
 }
