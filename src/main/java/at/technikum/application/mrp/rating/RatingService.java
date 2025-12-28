@@ -1,5 +1,6 @@
 package at.technikum.application.mrp.rating;
 
+import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import java.util.List;
@@ -7,9 +8,9 @@ import java.util.List;
 public class RatingService {
 
 
-    private final RatingRepository ratingRepository;
+    private final RatingRepositoryC ratingRepository;
 
-    public RatingService(RatingRepository ratingRepository) {
+    public RatingService(RatingRepositoryC ratingRepository) {
         this.ratingRepository = ratingRepository;
     }
 
@@ -21,7 +22,7 @@ public class RatingService {
         return ratingRepository.save(rating, mediaId);
     }
 
-    public Rating get(String id) {
+    public Rating get(int id) {
         return ratingRepository.find(id)
                 .orElseThrow(EntityNotFoundException::new);
     }
@@ -30,19 +31,37 @@ public class RatingService {
         return ratingRepository.findAll();
     }
 
-    public Rating update(String Title, Rating update) {
-        //Hier noch wirklich ändern, nach was suchen hier? einzigartig??
-        Rating rating = ratingRepository.find(update.getComment())
-                .orElseThrow(EntityNotFoundException::new);
+    public void update(Rating update, int userId) {
+        //System.out.println("Rating exists:" +ratingRepository.ratingExistsById(update.getId()));
+        if(!ratingRepository.ratingExistsById(update.getId())){
+            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ update.getMediaId()+ ", does not Exist");
+        }
 
-        //rating.setTitle(update.getTitle());
-        //rating.setDone(update.isDone());
-
-        //return ratingRepository.save(rating, 0);
-        return rating;
+        ratingRepository.update(update, userId);
     }
 
-    public Rating delete(String title) {
-        return ratingRepository.delete(title);
+    public boolean delete(int ratingId, int userId) {
+        System.out.println("exists:"+ratingRepository.ratingExistsById(ratingId));
+        if(ratingRepository.ratingExistsById(ratingId)==false){
+            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
+        }
+        System.out.println("here");
+
+        return ratingRepository.delete(ratingId, userId);
+    }
+
+    public boolean like(int ratingId, int userId){
+        if(!ratingRepository.ratingExists(ratingId, userId)){
+            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
+        }
+
+        return ratingRepository.like(ratingId, userId);
+    }
+
+    public boolean confirm(int ratingId, int userId){
+        if(!ratingRepository.ratingExists(ratingId, userId)){
+            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
+        }
+        return ratingRepository.confirm(ratingId,userId);
     }
 }

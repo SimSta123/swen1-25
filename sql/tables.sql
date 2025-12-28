@@ -54,6 +54,7 @@ CREATE TABLE ratings (
     rating INT CHECK (rating BETWEEN 1 AND 5) NOT NULL,
     comment TEXT,
     commentConfirmed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (userId, mediaId) -- ein rating pro user pro media
 );
 

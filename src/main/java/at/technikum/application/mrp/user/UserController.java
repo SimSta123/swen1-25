@@ -2,6 +2,9 @@ package at.technikum.application.mrp.user;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
+import at.technikum.application.mrp.authentification.AuthService;
+import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
+import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.server.http.*;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +13,11 @@ import java.util.Map;
 public class UserController extends Controller {
 
     private final UserService userService;
-    public UserController(UserService userService) { this.userService = userService; }
+    private final AuthService authService;
+    public UserController(UserService userService, AuthService authService) {
+        this.userService = userService;
+        this.authService = authService;
+    }
 
     @Override
     public Response handle(Request request) {
@@ -86,62 +93,70 @@ public class UserController extends Controller {
         //return text(user.toString());
     }
 
-    //Braucht man hier ein request zum login??? Wegen login daten??
     private Response read(int ID) {
         User gUser = new User();
         Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
         try {
             //gUser = userService.findByUsername(user.getUsername());
             System.out.println("in READ");
-            gUser = userService.findByID(ID);
+            gUser = userService.get(ID);
+
             response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
-            response.setBody("User found: " + gUser.getUsername());
+            String body = "User found: Username: " + gUser.getUsername()+ ", PW:"+gUser.getPassword()+", ID: "+gUser.getId();
+            response.setBody(body);
             return json(response, Status.OK);
+        }  catch (EntityNotFoundException e){
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody("err: Kein User mit dieser ID gefunden, "+e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (RuntimeException e) {
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody("err: Kein User mit dieser ID gefunden, "+e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody("err: "+e.getMessage());
             return json(e.getMessage(), Status.BAD_REQUEST);
         }
     }
 
     private Response create(Request request) {
         User user = toObject(request.getBody(), User.class);
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
 
         try {
-            user = userService.create(user);
+            boolean done = authService.createUser(user);
+            response.setStatus(Status.CREATED);
+            response.setBody("user registered, done: "+done);
+            return json(response, Status.CREATED);
+        } catch (DuplicateAlreadyExistsException e) {
+            response.setStatus(Status.CONFLICT);
+            response.setBody("err: Username already exists");
+            return json(response, Status.CONFLICT);
+        } catch (IllegalArgumentException e){
+            response.setStatus(Status.CONFLICT);
+            response.setBody("err: "+e.getMessage());
+            return json(response, Status.CONFLICT);
         } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody("err: "+e.getMessage());
             return json(e.getMessage(), Status.BAD_REQUEST);
         }
-
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody("user registered");
-        return json(response, Status.CREATED);
-        //Rückgeben "User Created";
-
-        /*
-        User user = toObject(request.getBody(), User.class);
-        user = todoService.create(user);
-        return json(user, Status.CREATED);
-         */
-        //return null;
-
     }
 
     private Response logIn(Request request) {
         //ganz in den AuthService
         User user = toObject(request.getBody(), User.class);
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
         try {
-            boolean logedIn = userService.logIn(user);
-            Response response = new Response();
+            String token = authService.logIn(user);
             response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
-            if(logedIn==true) {
-                response.setBody("user logged in"+" {token: "+ userService.getToken(user)+"}");
-            }
-            else {
-                response.setBody("user log in failed");
-            }
+            response.setBody("user logged in"+" {token: "+ token+"}");
+            response.setAuth(true);
+            //Kein String token?????? SOll das irgendwo gepseichert werden?
             return json(response, Status.OK);
         } catch (Exception e) {
             return json(e.getMessage(), Status.BAD_REQUEST);

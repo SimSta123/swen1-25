@@ -1,11 +1,13 @@
 package at.technikum.application;
 
 import at.technikum.application.common.*;
+import at.technikum.application.mrp.authentification.AuthRepositoryC;
 import at.technikum.application.mrp.leaderboard.*;
 import at.technikum.application.mrp.rating.*;
 import at.technikum.application.mrp.media.*;
 import at.technikum.application.mrp.route_not_found.NotFoundController;
 import at.technikum.application.mrp.user.*;
+import at.technikum.application.mrp.authentification.*;
 import at.technikum.application.todo.exception.*;
 import at.technikum.server.http.*;
 
@@ -28,7 +30,7 @@ public class MRPApplication implements Application {
                 "mrpdb"
         );
 
-        router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool))));
+        router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool)),new AuthService(new AuthRepositoryC(connectionPool))));
         router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool))));
         router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC(connectionPool))));
         router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC())));

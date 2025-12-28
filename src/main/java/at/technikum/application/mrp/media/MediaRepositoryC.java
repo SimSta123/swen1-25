@@ -3,6 +3,7 @@ package at.technikum.application.mrp.media;
 import at.technikum.application.common.ConnectionPool;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.user.User;
+import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import java.sql.Connection;
@@ -182,8 +183,8 @@ public class MediaRepositoryC implements MediaRepository {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            //e.printStackTrace();
+            throw new DuplicateAlreadyExistsException(e);
         }
         return media;
     }

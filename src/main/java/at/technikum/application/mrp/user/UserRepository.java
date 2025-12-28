@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    Optional<User> find(String id);
+    Optional<User> find(int id);
 
     List<User> findAll();
 

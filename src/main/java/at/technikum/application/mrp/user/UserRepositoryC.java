@@ -13,10 +13,12 @@ public class UserRepositoryC implements UserRepository {
 
     private final ConnectionPool connectionPool;
 
+    /*
     private static final String CREATE
             = "INSERT INTO users (username, password, uuid) VALUES (?,?,?)";
+     */
 
-    private static final String SELECT_BY_ID
+    private final String SELECT_BY_ID
             = "SELECT * FROM users WHERE id = ?";
 
     private static final String SELECT_ALL
@@ -34,31 +36,27 @@ public class UserRepositoryC implements UserRepository {
     }
 
     @Override
-    public Optional<User> find(String id) {
+    public Optional<User> find(int id) {
         try (
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(SELECT_BY_ID);
         ) {
-            System.out.println("trying to read user");
-            pstmt.setInt(1, Integer.parseInt(id));
-
-            //try (ResultSet rs = pstmt.getResultSet()) {
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (!rs.next()) {return Optional.empty();
-                }
-
-                User user = new User(
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        Integer.parseInt(rs.getString("id"))
-                        );
-
-                return Optional.of(user);
+            System.out.println("trying read users");
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (!rs.next()) {
+                System.out.println(id);
+                return Optional.empty();
             }
 
+            User user = new User(
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    Integer.parseInt(rs.getString("id"))
+            );
+            return Optional.of(user);
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error fetching user with id \"" + id,e);
         }
     }
 
@@ -94,6 +92,7 @@ public class UserRepositoryC implements UserRepository {
 
     @Override
     public Optional<User> save(User user) {
+        /*
         try (
                 Connection conn = connectionPool.getConnection();
         ) {
@@ -112,6 +111,8 @@ public class UserRepositoryC implements UserRepository {
 
             throw new RuntimeException(e);
         }
+         */
+        return null;
     }
 
     @Override

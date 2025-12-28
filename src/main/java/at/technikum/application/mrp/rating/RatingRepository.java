@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface RatingRepository {
 
-    Optional<Rating> find(String id);
+    Optional<Rating> find(int id);
 
     List<Rating> findAll();
 
@@ -13,5 +13,5 @@ public interface RatingRepository {
 
     // Todo update(Todo todo);
 
-    Rating delete(String id);
+    boolean delete(int ratingId, int userId);
 }

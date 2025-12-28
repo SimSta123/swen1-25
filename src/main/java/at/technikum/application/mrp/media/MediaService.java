@@ -1,6 +1,7 @@
 package at.technikum.application.mrp.media;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.rating.RatingService;
+import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import java.util.List;
@@ -84,7 +85,7 @@ public class MediaService {
                 );
 
         if(mediaRepository.ratingExists(mediaId, rating.getCreatorId())){
-            throw new EntityNotFoundException("Rating already exists");
+            throw new DuplicateAlreadyExistsException("Rating with the given params already exists");
         }
         System.out.println("media found and rating not found");
         return mediaRepository.saveRating(rating, mediaId);

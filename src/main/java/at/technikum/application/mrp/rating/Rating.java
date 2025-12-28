@@ -2,17 +2,19 @@ package at.technikum.application.mrp.rating;
 
 import at.technikum.application.mrp.media.Media;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class Rating {
     private int id;
-    private Media media;
+    private Media media;    //ist nötig? glaube nicht
+    private int mediaId;
     private int stars;
     private String comment;
-    private String timeStamp;
+    private Timestamp timeStamp;
     private List<Integer> like;
     private int creatorID;
-    private boolean confirmed = false;;
+    private boolean confirmed = false;
 
     public Rating() {}
 
@@ -42,11 +44,11 @@ public class Rating {
         this.comment = comment;
     }
 
-    public String getTimeStamp() {
+    public Timestamp getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(Timestamp timeStamp) {
         this.timeStamp = timeStamp;
     }
 
@@ -73,4 +75,8 @@ public class Rating {
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
     }
+
+    public void setMediaId(int mediaId) {this.mediaId = mediaId;}
+
+    public int getMediaId() {return mediaId;}
 }

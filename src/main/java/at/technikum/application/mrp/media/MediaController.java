@@ -4,6 +4,7 @@ import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.user.User;
+import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.server.http.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,6 +113,7 @@ public class MediaController extends Controller {
 
     }
 
+    //Korrekte ERRORCODES!!!!!!!!!!!!!
     private Response create(Request request) {
         System.out.println("in MediaController");
         Response response = new Response();
@@ -120,9 +122,13 @@ public class MediaController extends Controller {
             Media media = toObject(request.getBody(), Media.class);
             mediaService.create(media);
             System.out.println("after save");
-            response.setStatus(Status.OK);
+            response.setStatus(Status.CREATED);
             response.setBody("done");
-            return json(response, Status.OK);
+            return json(response, Status.CREATED);
+        } catch(DuplicateAlreadyExistsException e){
+            response.setStatus(Status.CONFLICT);
+            response.setBody("This media already exists");
+            return json(response,Status.CONFLICT);
         } catch (Exception e){
             response.setStatus(Status.BAD_REQUEST);
             response.setBody(e.getMessage());

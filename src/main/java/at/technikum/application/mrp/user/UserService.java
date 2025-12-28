@@ -1,7 +1,8 @@
 package at.technikum.application.mrp.user;
 
+import at.technikum.application.mrp.authentification.AuthRepositoryC;
 import at.technikum.application.mrp.authentification.AuthService;
-import at.technikum.application.todo.exception.EntityNotFoundException;
+import at.technikum.application.todo.exception.*;
 
 import java.util.*;
 
@@ -21,11 +22,11 @@ public class UserService {
     public UserService() {
         this.userRepository = null;
         this.users = new ArrayList<>();
-        this.auth = new AuthService();
     }
 
     public User create(User user) {
         // is user valid?
+        /*
         System.out.println("try to create");
         if(!AuthService.checkData(user)){
             throw new IllegalArgumentException("Username or Password Illegal");
@@ -44,11 +45,13 @@ public class UserService {
         Optional<User> optionalUser = userRepository.save(user);
         User savedUser = optionalUser.get();
         return savedUser;
+         */
+        return null;
     }
 
-    public User get(String id) {
+    public User get(int id) {
         return userRepository.find(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("None found with the given ind"));
     }
 
     public List<User> getAll() {
@@ -69,35 +72,6 @@ public class UserService {
 
     public User delete(int id) {
         return userRepository.delete(String.valueOf(id));
-    }
-
-    //Hier noch, weil im Moment hier die User in einer Liste gepsiechert werden.
-    public boolean logIn(User user) {
-        if(!AuthService.checkData(user)){
-            throw new IllegalArgumentException("Username or Password Illegal");
-        }
-        System.out.println("Username and password passed verification");
-        boolean unExists = users.stream()
-                .anyMatch(u -> u.getUsername().equals(user.getUsername()));
-        System.out.println("Username exists");
-        if(unExists==true){
-            User foundUser = users.stream()
-                    .filter(u -> u.getUsername().equals(user.getUsername()))
-                    .findFirst()//first element of the Stream, optional zurück, weil es einen Stream zurückgiebt
-                    .orElse(null); //wenn kein Wert dann null
-            if(foundUser.getPassword().equals(user.getPassword())){
-                System.out.println("User loged in");
-                auth.createToken(user);
-                return true;
-            }
-            else{
-                System.out.println("Username and Password Mismatch");
-                return false;
-            }
-        }
-        System.out.println("User not found");
-        //hier noch Exception einbauen zum Werfen.
-        return false;
     }
 
     public User findByUsername(String username) {
