@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Rating {
     private int id;
-    private Media media;    //ist nötig? glaube nicht
+    //private Media media;    //ist nötig? glaube nicht
     private int mediaId;
     private int stars;
     private String comment;
@@ -21,7 +21,7 @@ public class Rating {
     public void setId(int id) { this.id = id; }
 
     public int getId() { return id; }
-
+    /*
     public Media getMedia() {
         return media;
     }
@@ -29,6 +29,8 @@ public class Rating {
     public void setMedia(Media media) {
         this.media = media;
     }
+
+     */
 
     public int getStars() {return stars;}
 

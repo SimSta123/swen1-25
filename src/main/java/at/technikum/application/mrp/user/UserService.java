@@ -2,6 +2,7 @@ package at.technikum.application.mrp.user;
 
 import at.technikum.application.mrp.authentification.AuthRepositoryC;
 import at.technikum.application.mrp.authentification.AuthService;
+import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.todo.exception.*;
 
 import java.util.*;
@@ -56,6 +57,10 @@ public class UserService {
 
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    public List<Rating> ratingHistory(int id) {
+        return userRepository.ratingHistory(id);
     }
 
     public User update(String id, User update) {

@@ -7,7 +7,7 @@ public interface RatingRepository {
 
     Optional<Rating> find(int id);
 
-    List<Rating> findAll();
+    List<Rating> findAll(int id);
 
     boolean save(Rating user, int userId);
 

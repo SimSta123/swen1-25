@@ -27,8 +27,8 @@ public class RatingService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
-    public List<Rating> getAll() {
-        return ratingRepository.findAll();
+    public List<Rating> getAll(int id) {
+        return ratingRepository.findAll(id);
     }
 
     public void update(Rating update, int userId) {

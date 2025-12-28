@@ -3,9 +3,12 @@ package at.technikum.application.mrp.user;
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.authentification.AuthService;
+import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.server.http.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +28,8 @@ public class UserController extends Controller {
         //Dass zu einer Switch-Case machen --> Geht nicht, switch(boolean) muss JDK 23 haben.
         if (request.getMethod().equals(Method.GET.getVerb())) {
             if (request.getPath().equals("/api/users")) {
-                return readAll();
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return readAll();
             }
             System.out.println("GET: "+UrlID.urlID(request.getPath()));
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/profile")) {
@@ -34,7 +38,8 @@ public class UserController extends Controller {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
             }
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/ratings")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return json("doesn't exist yet",Status.NOT_FOUND);
+                return ratingHistory(UrlID.urlID(request.getPath()));
             }
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/favorites")) {
                 return json("doesn't exist yet",Status.NOT_FOUND);
@@ -81,7 +86,7 @@ public class UserController extends Controller {
         return null;
     }
 
-    private Response readAll() {
+    private Response readAll(int id) {
         List<User> user = userService.getAll();
 
         text(user.toString());
@@ -182,6 +187,26 @@ public class UserController extends Controller {
         response.setContentType(ContentType.TEXT_PLAIN);
         response.setBody("user deleted");
         return json(response, Status.NO_CONTENT);
+    }
+
+    private Response ratingHistory(int id){
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            List<Rating> rl = userService.ratingHistory(id);
+
+            response.setContentType(ContentType.APPLICATION_JSON);
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(rl);
+            response.setBody(jsonBody);
+
+            response.setStatus(Status.OK);
+            return json(response, Status.OK);
+        } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody("err: "+e.getMessage());
+            return json(e.getMessage(), Status.BAD_REQUEST);
+        }
     }
 }
 

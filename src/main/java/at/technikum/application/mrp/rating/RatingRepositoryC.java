@@ -68,12 +68,30 @@ public class RatingRepositoryC implements RatingRepository{
     }
 
     @Override
-    public List<Rating> findAll() {
-        Rating rating = new Rating();
-        rating.setComment("1");
-        List<Rating> ratings = new ArrayList<>();
-        ratings.add(rating);
-        return ratings;
+    public List<Rating> findAll(int id) {
+        List<Rating> ratingList = new ArrayList<>();
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FIND_BY_ID);
+        ) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            Rating rating = new Rating();
+            while(rs.next()) {
+                rating.setId(rs.getInt("id"));
+                rating.setCreatorId(rs.getInt("userId"));
+                rating.setMediaId(rs.getInt("mediaId"));
+                rating.setStars(rs.getInt("rating"));
+                rating.setComment(rs.getString("comment"));
+                rating.setTimeStamp(rs.getTimestamp("created_at"));
+                rating.setConfirmed(rs.getBoolean("commentconfirmed"));
+                ratingList.add(rating);
+            }
+            return ratingList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override

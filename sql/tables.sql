@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS media(
-    title varchar(36) NOT NULL,
+    title varchar(36) UNIQUE NOT NULL,
     description TEXT,
     mediaType TEXT CHECK (mediaType IN ('movie','series','game')),
     releaseYear INT,

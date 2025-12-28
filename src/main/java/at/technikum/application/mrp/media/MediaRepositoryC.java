@@ -184,9 +184,21 @@ public class MediaRepositoryC implements MediaRepository {
 
         } catch (SQLException e) {
             //e.printStackTrace();
-            throw new DuplicateAlreadyExistsException(e);
+            throw new RuntimeException(e);
         }
         return media;
+    }
+
+    public void createGenre(Media media){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(CREATE);
+        ){
+
+        } catch (SQLException e) {
+        //e.printStackTrace();
+        throw new RuntimeException(e);
+    }
     }
 
     @Override

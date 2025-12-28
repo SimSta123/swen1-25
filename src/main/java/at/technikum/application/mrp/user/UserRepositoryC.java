@@ -1,6 +1,9 @@
 package at.technikum.application.mrp.user;
 
 import at.technikum.application.common.ConnectionPool;
+import at.technikum.application.mrp.rating.Rating;
+
+import javax.sound.midi.SysexMessage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,18 +21,21 @@ public class UserRepositoryC implements UserRepository {
             = "INSERT INTO users (username, password, uuid) VALUES (?,?,?)";
      */
 
-    private final String SELECT_BY_ID
+    private String SELECT_BY_ID
             = "SELECT * FROM users WHERE id = ?";
 
-    private static final String SELECT_ALL
+    private final String SELECT_ALL
             = "SELECT * FROM users";
 
-    private static final String UPDATE_BY_ID
+    private final String UPDATE_BY_ID
             = "UPDATE users SET username = ?, password = ? WHERE id = ?";
 
     //User muss nicht eig Profil löschen können
     private final String DELETE_BY_ID
             = "DELETE FROM users WHERE id=?";
+
+    private final String FIND_BY_USER_ID
+            = "SELECT * FROM ratings WHERE userId = ? ORDER BY created_at DESC";
 
     public UserRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -156,5 +162,32 @@ public class UserRepositoryC implements UserRepository {
         }
     }
 
+    public List<Rating> ratingHistory(int userId) {
+        List<Rating> ratingList = new ArrayList<>();
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FIND_BY_USER_ID);
+        ) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            //nicht geordnet, da keine Ordnung muss
+            while (rs.next()) {
+                Rating rating = new Rating();
+                rating.setId(rs.getInt("id"));
+                rating.setCreatorId(rs.getInt("userId"));
+                rating.setMediaId(rs.getInt("mediaId"));
+                rating.setStars(rs.getInt("rating"));
+                rating.setComment(rs.getString("comment"));
+                rating.setTimeStamp(rs.getTimestamp("created_at"));
+                rating.setConfirmed(rs.getBoolean("commentconfirmed"));
+                System.out.println(rating.toString());
+                ratingList.add(rating);
+            }
+            return ratingList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
 
+    }
 }
