@@ -171,8 +171,31 @@ public class UserController extends Controller {
 
     }
 
-    private Response update() {
-        return null;
+    private Response update(Request request, int userId) {
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            User user = toObject(request.getBody(), User.class);
+            boolean done = userService.update(user, userId);
+            response.setStatus(Status.OK);
+            response.setBody("Update done: "+ done+", at userId: "+ userId);
+            return json(response, Status.NOT_FOUND);
+        } catch (EntityNotFoundException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody(e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
+        }
     }
 
     private Response delete(int id) {

@@ -15,5 +15,5 @@ public interface UserRepository {
 
     User delete(String id);
 
-    User update(User user);
+    boolean update(User user);
 }

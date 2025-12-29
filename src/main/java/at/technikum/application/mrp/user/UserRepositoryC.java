@@ -131,7 +131,7 @@ public class UserRepositoryC implements UserRepository {
     }
 
     @Override
-    public User update(User user) {
+    public boolean update(User user) {
         try (
                 Connection conn = connectionPool.getConnection();
         ) {
@@ -142,7 +142,7 @@ public class UserRepositoryC implements UserRepository {
                 pstmt.setInt(3, user.getId());
                 pstmt.executeUpdate();
                 System.out.println("Database Saved");
-                return user;
+                return true;
             }
 
         } catch (SQLException e) {

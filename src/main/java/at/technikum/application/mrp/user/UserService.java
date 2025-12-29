@@ -65,16 +65,10 @@ public class UserService {
         return userRepository.ratingHistory(id);
     }
 
-    public User update(String id, User update) {
-        /*
-        User user = userRepository.find(id)
-                .orElseThrow(EntityNotFoundException::new);
-
-        user.setUsername(update.getUsername());
-        user.setDone(update.isDone());
-         */
-
-        return userRepository.update(update);
+    public boolean update(User update, int userId) {
+        update.setId(userId);
+        userRepository.update(update);
+        return true;
     }
 
     public User delete(int id) {

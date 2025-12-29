@@ -3,6 +3,8 @@ package at.technikum.application.mrp.leaderboard;
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.server.http.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.sound.midi.SysexMessage;
 import java.util.List;
@@ -23,7 +25,8 @@ public class LeaderboardController extends Controller {
 
         if (request.getMethod().equals(Method.GET.getVerb())) {
             if (request.getPath().equals("/api/leaderboard")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
+                return readAll();
+                //return json("doesn't exist yet",Status.NOT_FOUND);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
@@ -52,15 +55,24 @@ public class LeaderboardController extends Controller {
     }
 
     private Response readAll() {
-        List<Leaderboard> media = leaderboardService.getAll();
-
-        text(media.toString());
         Response response = new Response();
         response.setStatus(Status.OK);
         response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody("Leaderboard");
-        return response;
-        //return text(media.toString());
+        try {
+            System.out.println("in readAll");
+            List<Leaderboard> leaderB = leaderboardService.getAll();
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(leaderB);
+            response.setBody(jsonBody);
+            System.out.println("XX");
+            return json(response, Status.OK);
+            //return text(media.toString());
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Response read() {
