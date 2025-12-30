@@ -44,7 +44,7 @@ public class UserRepositoryC implements UserRepository {
             = "SELECT genreId FROM media_genres WHERE mediaId = ?";
 
     private final String GET_GENRE_NAME
-            = "SELECT genreName FROM genres WHERE id = ?";
+            = "SELECT genreName FROM genres WHERE mgid = ?";
 
     public UserRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -239,8 +239,6 @@ public class UserRepositoryC implements UserRepository {
                 return media;
             }
             return null;
-
-
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

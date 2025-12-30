@@ -2,8 +2,6 @@ package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.ConnectionPool;
 import at.technikum.application.mrp.rating.Rating;
-import at.technikum.application.mrp.user.User;
-import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import java.sql.Connection;
@@ -63,7 +61,11 @@ public class MediaRepositoryC implements MediaRepository {
     private final String FAV_EXISTST
             = "SELECT * FROM favorites WHERE mediaId = ? AND userId = ?";
 
+    private final String SELECT_RATING
+            = "SELECT rating FROM ratings WHERE mediaId = ?";
 
+    private final String GET_GENRE_NAME
+            = "SELECT genreName from genres WHERE mgid = ?";
 
     public MediaRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -118,10 +120,12 @@ public class MediaRepositoryC implements MediaRepository {
         List<Media> medias = new ArrayList<>();
         try (
                 Connection conn = connectionPool.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(GET_ALL)
+                PreparedStatement pstmt = conn.prepareStatement(GET_ALL);
+                PreparedStatement pstmt_2 = conn.prepareStatement(SELECT_RATING)
         ) {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
+                System.out.println("in while");
                 Media media = new Media(
                         rs.getString("title"),
                         rs.getString("description"),
@@ -131,7 +135,20 @@ public class MediaRepositoryC implements MediaRepository {
                         Integer.parseInt(rs.getString("creator_id")),
                         Integer.parseInt(rs.getString("mediaID"))
                 );
-                System.out.println(media.toString());
+                pstmt_2.setInt(1,media.getMediaID());
+                ResultSet rs_2 = pstmt_2.executeQuery();
+                double count = 0;
+                int rating = 0;
+                while(rs_2.next()){
+                    //media.setAverageRating(rs.getInt("rating"));
+                    rating += rs_2.getInt("rating");
+                    System.out.println("score:" +rating+" count: "+count);
+                    count++;
+                }
+                if(count>0&&rating>0){
+                    media.setAverageRating(media.getAverageRating()/count);
+                    media.setAverageRating(rating/count);
+                }
                 medias.add(media);
             }
             return medias;
@@ -183,6 +200,8 @@ public class MediaRepositoryC implements MediaRepository {
                 if (rs.next()) {
                     genreID = rs.getInt("id");
                 }
+
+
                 pstmt_3.setInt(1,mediaID);
                 pstmt_3.setInt(2,genreID);
                 pstmt_3.executeUpdate();
@@ -200,6 +219,24 @@ public class MediaRepositoryC implements MediaRepository {
         return media;
     }
 
+    public List<String> getGenreName(int mediaId){
+        List<String> genres = new ArrayList<>();
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(GET_GENRE_NAME);
+        ){
+            pstmt.setInt(1, mediaId);
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()){
+                genres.add(rs.getString("genreName"));
+            }
+            return genres;
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     public void createGenre(Media media){
         try (
                 Connection conn = connectionPool.getConnection();
@@ -207,9 +244,9 @@ public class MediaRepositoryC implements MediaRepository {
         ){
 
         } catch (SQLException e) {
-        //e.printStackTrace();
-        throw new RuntimeException(e);
-    }
+            //e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

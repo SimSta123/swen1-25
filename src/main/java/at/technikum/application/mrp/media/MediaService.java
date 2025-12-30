@@ -1,19 +1,25 @@
 package at.technikum.application.mrp.media;
+import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.rating.RatingService;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
+import at.technikum.server.http.Request;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MediaService {
 
     private final MediaRepositoryC mediaRepository;
+    private final MediaSearchFilterRepository mediaSearchFilterRepository;
 
-    public MediaService(MediaRepositoryC mediaRepository) {
+    public MediaService(MediaRepositoryC mediaRepository, MediaSearchFilterRepository mediaSearchFilterRepository) {
         this.mediaRepository = mediaRepository;
+        this.mediaSearchFilterRepository = mediaSearchFilterRepository;
     }
+
 
     public Media create(Media media) {
         // is todo valid?
@@ -117,5 +123,13 @@ public class MediaService {
         }
 
         return mediaRepository.favDelete(mediaId, userId);
+    }
+
+    public List<Media> search(Request request){
+        List<Media> medias = new ArrayList<>();
+        System.out.println("kk--------------------------------------------------------");
+        System.out.println(UrlID.handleMediaTitle(request.getUri()));
+        medias = mediaSearchFilterRepository.findAll(UrlID.handleMediaTitle(request.getUri()));
+        return mediaSearchFilterRepository.getGenres(medias);
     }
 }

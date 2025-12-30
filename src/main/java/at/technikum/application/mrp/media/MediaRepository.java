@@ -11,7 +11,5 @@ public interface MediaRepository {
 
     Media save(Media media);
 
-    // Todo update(Todo todo);
-
     Media delete(int id);
 }

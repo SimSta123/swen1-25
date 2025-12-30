@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS media(
 );
 
 CREATE TABLE genres (
-    id SERIAL PRIMARY KEY,
+    mgid SERIAL PRIMARY KEY,
     genreName TEXT UNIQUE NOT NULL
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE genres (
 CREATE TABLE media_genres (
     id SERIAL PRIMARY KEY,
     mediaId INT NOT NULL REFERENCES media(mediaId) ON DELETE CASCADE,
-    genreId INT NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    genreId INT NOT NULL REFERENCES genres(mgid) ON DELETE CASCADE,
     UNIQUE (mediaId, genreId) -- Die kombinationen dürfen alle nur einmal vorkommen
 );
 
@@ -80,3 +80,55 @@ CREATE TABLE recommendations (
 -- TRIGGERS / Notizen
 -- 1. Update media.averagScore wen neues/edites rating
 -- 2. generete recommendations???
+/*
+ RETURNS TRIGGER = wird vom trigger ausgeführt? -> singlaisiert das funktion nicht ergebnis zurückgibt sonder als trigger abreitet?
+ Alles zwischen $$ und $$ ist die fuktion
+ TG_OP = Trigger Optionen (CREATE, DELETE, UPDATE)
+ OLD = Zeile vor änderung (DELETE und UPDATE), NEW = Zeile nach änderung (INSERT und UPDATE)
+ COALESCE(value, 0) ersetzt NULL durch 0. -> keine ratings dann 0 einsetzen
+ :: Typ-Cast-Operator
+ */
+CREATE OR REPLACE FUNCTION updateAvgScMedia()
+    RETURNS TRIGGER AS $$
+DECLARE
+    target_media_id INT;
+BEGIN
+    -- Prüfen, ob INSERT/UPDATE oder DELETE
+    IF TG_OP = 'DELETE' THEN
+        target_media_id := OLD.mediaid;
+    ELSE
+        target_media_id := NEW.mediaid;
+    END IF;
+
+    -- Durchschnitt für das betreffende Media aktualisieren
+    UPDATE media
+    SET average_score = (
+        SELECT COALESCE(AVG(rating), 0)::DECIMAL(3,2)
+        FROM ratings
+        WHERE mediaid = target_media_id
+    )
+    WHERE mediaid = target_media_id;
+
+    -- Für AFTER Trigger RETURN NULL bei DELETE, sonst RETURN NEW
+    IF TG_OP = 'DELETE' THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER updateAvgScMediaInsert
+    AFTER INSERT ON ratings
+    FOR EACH ROW
+EXECUTE FUNCTION updateAvgScMedia();
+
+CREATE TRIGGER updateAvgScMediaDelete
+    AFTER DELETE ON ratings
+    FOR EACH ROW
+EXECUTE FUNCTION updateAvgScMedia();
+
+CREATE TRIGGER updateAvgScMediaUpdate
+    AFTER UPDATE OF rating ON ratings
+    FOR EACH ROW
+EXECUTE FUNCTION updateAvgScMedia();

@@ -10,6 +10,8 @@ public class Request {
 
     private String body;
 
+    private String uri;
+
     public Request() {
     }
 
@@ -36,4 +38,8 @@ public class Request {
     public void setBody(String body) {
         this.body = body;
     }
+
+    public String getUri() {return uri;}
+
+    public void setUri(String uri) {this.uri = uri;}
 }

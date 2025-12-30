@@ -13,7 +13,12 @@ public class RequestMapper {
     public Request fromExchange(HttpExchange exchange) throws IOException {
         Request request = new Request();
         request.setMethod(Method.valueOf(exchange.getRequestMethod()));
+        System.out.println("getMethod: "+request.getMethod());
         request.setPath(exchange.getRequestURI().getPath());
+        System.out.println("URI: "+exchange.getRequestURI());
+        System.out.println("Path: "+request.getPath());
+        request.setUri(String.valueOf(exchange.getRequestURI()));
+        System.out.println("Request URI: "+request.getUri());
 
         InputStream is = exchange.getRequestBody();
 

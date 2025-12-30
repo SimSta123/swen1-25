@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.sound.midi.SysexMessage;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,15 +29,21 @@ public class MediaController extends Controller {
     public Response handle(Request request) {
 
         int id = UrlID.urlID(request.getPath());
-
+        String s = request.getMethod();
+        System.out.println("Method: "+s);
         if (request.getMethod().equals(Method.GET.getVerb())) {
-            if (request.getPath().equals("/api/media")) {
+            if(request.getPath().equals("/api/media")&&request.getUri().contains("/api/media?")) {
+                return filter(request);
+            }
+             else if (request.getPath().equals("/api/media")) {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
                 return readAll();
             } else if (request.getPath().equals("/api/media/"+id)) {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
                 return read(id);
-            } else {
+            } //else if(request.getPath().equals("/api/media?")){
+              //  return filter(request);
+            else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
         } else if (request.getMethod().equals(Method.POST.getVerb())) {
@@ -252,6 +259,41 @@ public class MediaController extends Controller {
             response.setBody("done: "+done+", deleted like on mediaId: "+mediaId);
             response.setStatus(Status.OK);
             return json(response,Status.OK);
+        } catch (EntityNotFoundException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody(e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
+        }
+    }
+
+    public Response filter(Request request){
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        System.out.println("we are in");
+        System.out.println("URI working with:"+request.getUri());
+        try{
+            response.setStatus(Status.OK);
+            response.setContentType(ContentType.APPLICATION_JSON);
+            List<Media> ls = new ArrayList<>();
+            ls = mediaService.search(request);
+            System.out.println(ls.toString());
+            ObjectMapper mapper = new ObjectMapper();
+            //String jsonBody = mapper.writeValueAsString(ls);
+            response.setBody(mapper.writeValueAsString(ls));
+            //response.setBody();
+            return json(response, Status.OK);
+            //return response;
         } catch (EntityNotFoundException e){
             System.out.println(e.getMessage());
             response.setStatus(Status.NOT_FOUND);

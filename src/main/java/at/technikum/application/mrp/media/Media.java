@@ -2,6 +2,7 @@ package at.technikum.application.mrp.media;
 
 import at.technikum.application.mrp.rating.Rating;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Media {
@@ -15,10 +16,9 @@ public class Media {
     private String description;
     private String mediaType;
     private int releaseYear;
-    private List<String> genre;
+    private List<String> genre = new ArrayList<>();
     private int ageRestriction;
     private String creatorUUID;
-    private List<Rating> rating;
     private double averageRating = 0.0;
     private boolean isDone;
     private int mediaID;
@@ -81,14 +81,6 @@ public class Media {
         this.creatorUUID = creatorUUID;
     }
 
-    public List<Rating> getRating() {
-        return rating;
-    }
-
-    public void setRating(List<String> rating) {
-        rating.addAll(rating);
-    }
-
     public double getAverageRating() {
         return averageRating;
     }
@@ -129,7 +121,7 @@ public class Media {
         this.ageRestriction = ageRestriction;
         this.creatorID = creatorID;
     }
-
+    //soll noch weg!!!!!!!!!!!!!!!
     public Media(String title, String description, String mediaType, int releaseYear, int ageRestriction, int creatorID, int mediaID){
         this.title = title;
         this.description = description;
@@ -141,6 +133,17 @@ public class Media {
         this.averageRating = 0.0;
     }
 
+    public Media(String title, String description, String mediaType, int releaseYear, int ageRestriction, int creatorID, int mediaID, double averageRating){
+        this.title = title;
+        this.description = description;
+        this.mediaType = mediaType;
+        this.releaseYear = releaseYear;
+        this.ageRestriction = ageRestriction;
+        this.creatorID = creatorID;
+        this.mediaID = mediaID;
+        this.averageRating = averageRating;
+    }
+
     @Override
     public String toString() {
         return "Media{" +
@@ -148,10 +151,11 @@ public class Media {
                 ", description='" + description + '\'' +
                 ", mediaType='" + mediaType + '\'' +
                 ", releaseYear=" + releaseYear +
+                ", genres=" + genre.toString() +
                 ", ageRestriction=" + ageRestriction +
                 ", creatorID=" + creatorID +
                 ", mediaID=" + mediaID +
-                ", averageRating=" + averageRating +
+                ", averageRating=" + averageRating + "\n" +
                 '}';
     }
 }
