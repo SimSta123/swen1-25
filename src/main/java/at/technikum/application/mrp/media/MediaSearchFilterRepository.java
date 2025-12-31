@@ -173,7 +173,7 @@ public class MediaSearchFilterRepository implements MediaRepository {
                 filter.append(" ORDER BY ");
                 switch (sortBy) {
                     case "title":
-                        filter.append("title");
+                        filter.append("m.title");
                         break;
                     case "rating":
                         filter.append("average_score");
@@ -184,7 +184,7 @@ public class MediaSearchFilterRepository implements MediaRepository {
                     case "ageRestriction":
                         filter.append("ageRestriction");
                     default:
-                        filter.append("title");
+                        filter.append("m.title");
                 }
                 filter.append(" DESC");
             }
