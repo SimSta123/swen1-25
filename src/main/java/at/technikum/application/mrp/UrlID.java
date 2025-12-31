@@ -32,8 +32,16 @@ public class UrlID {
     public static String extractQueryParam(String queryParams, String paramName) {
         if(queryParams.contains(paramName)) {
             int start = queryParams.indexOf(paramName + "=") + paramName.length() + 1;
-            int end = queryParams.indexOf("&", start);
-            System.out.println("start: " + start + ", end: " + end);
+            int end;
+            System.out.println("-----&:"+queryParams.indexOf("&"));
+            String sub = queryParams.substring(start);
+            if(sub.contains("&")){
+                end = queryParams.indexOf("&", start);
+            } else {
+                System.out.println("-------------------------------------------------lenght: "+queryParams.length());
+                end = queryParams.length();
+            }
+            System.out.println("What: "+ paramName + " start: " + start + ", end: " + end);
             return queryParams.substring(start, end);
         } else {
             return null;
@@ -78,6 +86,11 @@ public class UrlID {
 
     public static String handleMediaRating(String queryParams) {
         String title = extractQueryParam(queryParams, "rating");
+        return title;
+    }
+
+    public static String handleSortBy(String queryParams) {
+        String title = extractQueryParam(queryParams, "sortBy");
         return title;
     }
 }

@@ -11,7 +11,7 @@ JOIN media_genres mg ON mg.mediaid = m.mediaid
 JOIN users u ON m.creator_id = u.id
 JOIN genres g ON g.mgid = mg.genreid
 
-SELECT m.title, m.description, m.mediaType, m.releaseYear, m.agerestriction, m.average_score, m.mediaid, m.creator_id, mg.id, g.genrename, g.mgid
+SELECT DISTINCT m.title, m.description, m.mediaType, m.releaseYear, m.agerestriction, m.average_score, m.mediaid, m.creator_id, mg.id, g.genrename, g.mgid
 FROM media m
 JOIN media_genres mg ON mg.mediaid = m.mediaid
 JOIN genres g ON g.mgid = mg.genreid
@@ -76,6 +76,32 @@ SET average_score = (
 );
 
 ALTER TABLE genres RENAME COLUMN id TO mgid;
+
+SELECT DISTINCT
+    m.mediaid AS media_id,
+    m.title,
+    m.description,
+    m.mediatype,
+    m.releaseyear,
+    m.agerestriction,
+    m.average_score,
+    m.creator_id,
+    g.mgid AS genre_id,
+    g.genrename,
+    u.id AS user_id,
+    u.username
+FROM media m
+         JOIN media_genres mg ON mg.mediaid = m.mediaid
+         JOIN genres g ON g.mgid = mg.genreid
+         JOIN users u ON m.creator_id = u.id
+WHERE (m.title ILIKE '%inception%')
+  AND (g.genrename = 'sci-fi')
+  AND (m.mediatype = 'movie')
+  AND (m.releaseyear = 2010)
+  AND (m.agerestriction >= 12)
+  AND (m.average_score >= 4)
+ORDER BY title DESC;
+
 
 
 

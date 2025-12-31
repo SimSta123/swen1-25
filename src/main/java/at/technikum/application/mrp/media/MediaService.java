@@ -125,11 +125,18 @@ public class MediaService {
         return mediaRepository.favDelete(mediaId, userId);
     }
 
-    public List<Media> search(Request request){
+    public List<Media> search(String url){
         List<Media> medias = new ArrayList<>();
         System.out.println("kk--------------------------------------------------------");
-        System.out.println(UrlID.handleMediaTitle(request.getUri()));
-        medias = mediaSearchFilterRepository.findAll(UrlID.handleMediaTitle(request.getUri()));
+        String title = UrlID.handleMediaTitle(url);
+        //medias = mediaSearchFilterRepository.findAll(UrlID.handleMediaTitle(url));
+        String genre = UrlID.handleMediaGenre(url);
+        String mediaType = UrlID.handleMediaType(url);
+        String relYear = UrlID.handleMediaRelYear(url);
+        String ageRes = UrlID.handleMediaAgeRestr(url);
+        String rating = UrlID.handleMediaRating(url);
+        String sortBy = UrlID.handleSortBy(url);
+        medias = mediaSearchFilterRepository.filter(title, genre, mediaType, relYear, ageRes, rating, sortBy);
         return mediaSearchFilterRepository.getGenres(medias);
     }
 }

@@ -29,13 +29,13 @@ public class MediaController extends Controller {
     public Response handle(Request request) {
 
         int id = UrlID.urlID(request.getPath());
-        String s = request.getMethod();
-        System.out.println("Method: "+s);
+        String s = request.getUri();
+        System.out.println("Uri: "+s);
         if (request.getMethod().equals(Method.GET.getVerb())) {
             if(request.getPath().equals("/api/media")&&request.getUri().contains("/api/media?")) {
                 return filter(request);
             }
-             else if (request.getPath().equals("/api/media")) {
+             else if (request.getPath().equals("/api/media")&&request.getUri().contains("?")==false) {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
                 return readAll();
             } else if (request.getPath().equals("/api/media/"+id)) {
@@ -81,6 +81,7 @@ public class MediaController extends Controller {
     }
 
     private Response readAll() {
+        System.out.println("readAll------------------------------");
         try {
             List<Media> media = mediaService.getAll();
             Response response = new Response();
@@ -285,8 +286,7 @@ public class MediaController extends Controller {
         try{
             response.setStatus(Status.OK);
             response.setContentType(ContentType.APPLICATION_JSON);
-            List<Media> ls = new ArrayList<>();
-            ls = mediaService.search(request);
+            List<Media> ls = mediaService.search(request.getUri());
             System.out.println(ls.toString());
             ObjectMapper mapper = new ObjectMapper();
             //String jsonBody = mapper.writeValueAsString(ls);

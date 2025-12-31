@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class MediaSearchFilterRepository implements MediaRepository{
+public class MediaSearchFilterRepository implements MediaRepository {
 
     private final ConnectionPool connectionPool;
 
     private final String ALL_MEDIA_BY_TITLE
-            ="SELECT * FROM media WHERE title ILIKE ?";     //lower SELECT * FROM media WHERE LOWER(title) LIKE LOWER(?) würde auch gehen
+            = "SELECT * FROM media WHERE title ILIKE ?";     //lower SELECT * FROM media WHERE LOWER(title) LIKE LOWER(?) würde auch gehen
 
     private final String SELECT_RATING
             = "SELECT rating FROM ratings WHERE mediaId = ?";
@@ -27,22 +27,13 @@ public class MediaSearchFilterRepository implements MediaRepository{
     private final String GET_GENRE_NAME
             = "SELECT genreName from genres WHERE mgid = ?";
 
-    /*
     private final String GET_MEDIA
-            = "SELECT m.title, m.description, m.mediaType, m.releaseYear, m.agerestriction, m.average_score, m.mediaid, m.creator_id, mg.mgid, g.genrename, g.mgid"+
-                "FROM media m "+
-                "JOIN media_genres mg ON mg.mediaid = m.mediaid "+
-                "JOIN genres g ON g.id = mg.genreid "+
-                "WHERE m.title = ?";
-     */
-    private final String GET_MEDIA =
-            "SELECT m.title, m.description, m.mediaType, m.releaseYear, m.agerestriction, " +
-                    "m.average_score, m.mediaid, m.creator_id, g.mgid AS media_genre_id, g.genrename, g.mgid AS genre_id " +
-                    "FROM media m " +
-                    "JOIN media_genres mg ON mg.mediaid = m.mediaid " +
-                    "JOIN genres g ON g.mgid = mg.genreid " +
-                    "WHERE m.title ILIKE ?";
-
+            = "SELECT m.title, m.description, m.mediaType, m.releaseYear, m.agerestriction, " +
+            "m.average_score, m.mediaid, m.creator_id, g.mgid AS media_genre_id, g.genrename, g.mgid AS genre_id " +
+            "FROM media m " +
+            "JOIN media_genres mg ON mg.mediaid = m.mediaid " +
+            "JOIN genres g ON g.mgid = mg.genreid " +
+            "WHERE m.title ILIKE ?";
 
     public MediaSearchFilterRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -67,67 +58,6 @@ public class MediaSearchFilterRepository implements MediaRepository{
     public Media delete(int id) {
         return null;
     }
-    /*
-    public List<Media> findAll(String title) {
-        System.out.println("Title:"+title);
-        List<Media> medias = new ArrayList<>();
-        try (
-                Connection conn = connectionPool.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(ALL_MEDIA_BY_TITLE);
-                PreparedStatement pstmt_2 = conn.prepareStatement(SELECT_RATING);
-                PreparedStatement pstmt_3 = conn.prepareStatement(SELECT_GENRE_ID);
-                PreparedStatement pstmt_4 = conn.prepareStatement(GET_GENRE_NAME);
-        ) {
-            pstmt.setString(1, "%" + title + "%");  //die % machen das davor sowie danach beliebig sien kann
-
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Media media = new Media(
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getString("mediaType"),
-                        Integer.parseInt(rs.getString("releaseYear")),
-                        Integer.parseInt(rs.getString("ageRestriction")),
-                        Integer.parseInt(rs.getString("creator_id")),
-                        Integer.parseInt(rs.getString("mediaID"))
-                );
-                pstmt_2.setInt(1,media.getMediaID());
-                ResultSet rs_2 = pstmt_2.executeQuery();
-                double count = 0;
-                int rating = 0;
-                while(rs_2.next()){
-                    //media.setAverageRating(rs.getInt("rating"));
-                    rating += rs_2.getInt("rating");
-                    System.out.println("score:" +rating+" count: "+count);
-                    count++;
-                }
-                if(count>0&&rating>0){
-                    media.setAverageRating(media.getAverageRating()/count);
-                    media.setAverageRating(rating/count);
-                }
-                pstmt_3.setInt(1, media.getMediaID());
-                ResultSet genreId = pstmt_3.executeQuery();
-                List<String> ls = new ArrayList<>();
-                while(genreId.next()) {
-                    pstmt_4.setInt(1, genreId.getInt("genreId"));
-                    ResultSet genreName = pstmt_4.executeQuery();
-                    while (genreName.next()) {
-                        ls.add(genreName.getString("genreName"));
-                        System.out.println("Genre: "+genreName.getString("genreName"));
-                    }
-                }
-                media.setGenre(ls);
-                ls.clear();
-                //System.out.println(media.toString());
-                System.out.println(media.getGenre().toString());
-                medias.add(media);
-            }
-            return medias;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-     */
 
     public List<Media> findAll(String title) {
         System.out.println("Title:" + title);
@@ -147,7 +77,7 @@ public class MediaSearchFilterRepository implements MediaRepository{
                         break;
                     }
                 }
-                if(found==false) {
+                if (found == false) {
                     Media media = new Media();
                     media.setTitle(rs.getString("title"));
                     media.setDescription(rs.getString("description"));
@@ -169,7 +99,7 @@ public class MediaSearchFilterRepository implements MediaRepository{
         }
     }
 
-    public List<Media> getGenres(List<Media> medias){
+    public List<Media> getGenres(List<Media> medias) {
         System.out.println("1");
         try (
                 Connection conn = connectionPool.getConnection();
@@ -177,11 +107,11 @@ public class MediaSearchFilterRepository implements MediaRepository{
                 PreparedStatement pstmt_2 = conn.prepareStatement(GET_GENRE_NAME)
         ) {
             System.out.println("2");
-            for(int i = 0; i<medias.size(); i++) {
+            for (int i = 0; i < medias.size(); i++) {
                 pstmt.setInt(1, medias.get(i).getMediaID());
                 ResultSet mediaGenres = pstmt.executeQuery();
                 List<String> genres = new ArrayList<>();
-                System.out.println("3+"+i);
+                System.out.println("3+" + i);
                 while (mediaGenres.next()) {
                     pstmt_2.setInt(1, mediaGenres.getInt("genreId"));
                     ResultSet genreNames = pstmt_2.executeQuery();
@@ -194,6 +124,96 @@ public class MediaSearchFilterRepository implements MediaRepository{
                 medias.get(i).setGenre(genres);
             }
             return medias;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Media> filter(String title, String genre, String mediaType, String relYear, String ageRes, String rating, String sortBy) {
+        try (
+                Connection conn = connectionPool.getConnection();
+        ) {
+            List<Object> params = new ArrayList<>();
+
+            //StringBuilder für dynmaische QUeryies
+            StringBuilder filter = new StringBuilder("""       
+                SELECT DISTINCT m.*
+                FROM media m
+                LEFT JOIN media_genres mg ON mg.mediaid = m.mediaid
+                LEFT JOIN genres g ON g.mgid = mg.genreid
+                WHERE 1=1
+            """);
+
+            if (title != null) {
+                filter.append(" AND m.title ILIKE ?");
+                params.add("%" + title + "%");
+            }
+            if (genre != null) {
+                filter.append(" AND g.genrename ILIKE ?");
+                params.add(genre);
+            }
+            if (mediaType != null) {
+                filter.append(" AND m.mediatype = ?");
+                params.add("%" + mediaType + "%");
+            }
+            if (relYear != null) {
+                filter.append(" AND m.releaseyear = ?");
+                params.add(Integer.parseInt(relYear));
+            }
+            if (ageRes != null) {
+                filter.append(" AND m.agerestriction <= ?");
+                params.add(Integer.parseInt(ageRes));
+            }
+            if (rating != null) {   //min rating
+                filter.append(" AND m.average_score >= ?");
+                params.add(Double.valueOf(Double.parseDouble(rating)));
+            }
+            if (sortBy != null) {
+                filter.append(" ORDER BY ");
+                switch (sortBy) {
+                    case "title":
+                        filter.append("title");
+                        break;
+                    case "rating":
+                        filter.append("average_score");
+                        break;
+                    case "releaseYear":
+                        filter.append("releaseYear");
+                        break;
+                    case "ageRestriction":
+                        filter.append("ageRestriction");
+                    default:
+                        filter.append("title");
+                }
+                filter.append(" DESC");
+            }
+
+            PreparedStatement pstmt = conn.prepareStatement(filter.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+
+            List<Media> result = new ArrayList<>();
+
+            while (rs.next()) {
+                Media media = new Media(
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("mediatype"),
+                        rs.getInt("releaseyear"),
+                        rs.getInt("agerestriction"),
+                        rs.getInt("creator_id"),
+                        rs.getInt("mediaid"),
+                        rs.getInt("average_score")
+                );
+                result.add(media);
+            }
+            return result;
+
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
