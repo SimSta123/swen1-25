@@ -5,7 +5,7 @@ import java.util.*;
 
 public class TokenStore {
     //Keine Concurrent weil nur 1 Thread, Key = String (UserID)
-    private final Map<String,String> TOKENS = new HashMap<>();
+    private final Map<String,String> TOKENS = new HashMap<>();      //TOKENS == kann nicht neu zugewiesen werden
 
     public TokenStore() { }
 
@@ -37,6 +37,11 @@ public class TokenStore {
     public boolean isEmpty()
     {
         return TOKENS.isEmpty();
+    }
+
+    public boolean tokenExists(String token){
+        System.out.println(TOKENS.toString());
+        return TOKENS.containsValue(token);
     }
 
 

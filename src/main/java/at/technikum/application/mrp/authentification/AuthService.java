@@ -82,4 +82,17 @@ public class AuthService {
             return token;
         }
     }
+
+    public boolean tokenExists(String s, boolean isHeader) {
+        String token;
+        if(isHeader) {
+            token = s.substring(7);//Aus Headerstring nach Bearer
+        }
+        else {
+            token = s;
+        }
+        System.out.println("Token: ---"+tokenStore.tokenExists(token));
+        System.out.println(token);
+        return tokenStore.tokenExists(token);
+    }
 }

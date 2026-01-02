@@ -176,13 +176,13 @@ public class MediaSearchFilterRepository implements MediaRepository {
                         filter.append("m.title");
                         break;
                     case "rating":
-                        filter.append("average_score");
+                        filter.append("m.average_score");
                         break;
                     case "releaseYear":
-                        filter.append("releaseYear");
+                        filter.append("m.releaseYear");
                         break;
                     case "ageRestriction":
-                        filter.append("ageRestriction");
+                        filter.append("m.ageRestriction");
                     default:
                         filter.append("m.title");
                 }

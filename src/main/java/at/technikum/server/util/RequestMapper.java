@@ -19,6 +19,11 @@ public class RequestMapper {
         System.out.println("Path: "+request.getPath());
         request.setUri(String.valueOf(exchange.getRequestURI()));
         System.out.println("Request URI: "+request.getUri());
+        exchange.getRequestHeaders().forEach((key, values) -> {
+            if (!values.isEmpty()) {
+                request.setHeader(key, values.get(0));
+            }
+        });
 
         InputStream is = exchange.getRequestBody();
 

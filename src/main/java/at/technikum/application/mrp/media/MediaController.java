@@ -219,7 +219,7 @@ public class MediaController extends Controller {
         }
     }
 
-    public Response fav(int mediaId){
+    private Response fav(int mediaId){
         int userId = 1;
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
@@ -251,7 +251,7 @@ public class MediaController extends Controller {
         }
     }
 
-    public Response favDelete(int mediaId){
+    private Response favDelete(int mediaId){
         int userId = 1;
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
@@ -278,7 +278,7 @@ public class MediaController extends Controller {
         }
     }
 
-    public Response filter(Request request){
+    private Response filter(Request request){
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         System.out.println("we are in");

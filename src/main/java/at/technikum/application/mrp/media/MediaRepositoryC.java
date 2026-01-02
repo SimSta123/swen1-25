@@ -77,7 +77,6 @@ public class MediaRepositoryC implements MediaRepository {
         try (
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(GET_MEDIA_WHERE_ID);
-                PreparedStatement pstmt_2 = conn.prepareStatement(ALL_RATINGS)
         ) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -89,22 +88,9 @@ public class MediaRepositoryC implements MediaRepository {
                         rs.getInt("releaseYear"),
                         rs.getInt("ageRestriction"),
                         rs.getInt("creator_id"),
-                        rs.getInt("mediaID")
+                        rs.getInt("mediaID"),
+                        rs.getDouble("average_score")
                 );
-                pstmt_2.setInt(1,id);
-                rs = pstmt_2.executeQuery();
-                double count = 0;
-                int rating = 0;
-                while(rs.next()){
-                    //media.setAverageRating(rs.getInt("rating"));
-                    rating += rs.getInt("rating");
-                    System.out.println("score:" +rating+" count: "+count);
-                    count++;
-                }
-                if(count>0&&rating>0){
-                    media.setAverageRating(media.getAverageRating()/count);
-                    media.setAverageRating(rating/count);
-                }
                 return Optional.of(media);
             } else {
                 return Optional.empty(); // nichts gefunden
@@ -117,12 +103,11 @@ public class MediaRepositoryC implements MediaRepository {
 
     @Override
     public List<Media> findAll() {
-        List<Media> medias = new ArrayList<>();
         try (
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(GET_ALL);
-                PreparedStatement pstmt_2 = conn.prepareStatement(SELECT_RATING)
         ) {
+            List<Media> medias = new ArrayList<>();
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 System.out.println("in while");
@@ -133,22 +118,9 @@ public class MediaRepositoryC implements MediaRepository {
                         Integer.parseInt(rs.getString("releaseYear")),
                         Integer.parseInt(rs.getString("ageRestriction")),
                         Integer.parseInt(rs.getString("creator_id")),
-                        Integer.parseInt(rs.getString("mediaID"))
+                        Integer.parseInt(rs.getString("mediaID")),
+                        Integer.parseInt(rs.getString("average_score"))
                 );
-                pstmt_2.setInt(1,media.getMediaID());
-                ResultSet rs_2 = pstmt_2.executeQuery();
-                double count = 0;
-                int rating = 0;
-                while(rs_2.next()){
-                    //media.setAverageRating(rs.getInt("rating"));
-                    rating += rs_2.getInt("rating");
-                    System.out.println("score:" +rating+" count: "+count);
-                    count++;
-                }
-                if(count>0&&rating>0){
-                    media.setAverageRating(media.getAverageRating()/count);
-                    media.setAverageRating(rating/count);
-                }
                 medias.add(media);
             }
             return medias;
@@ -198,9 +170,8 @@ public class MediaRepositoryC implements MediaRepository {
                 int genreID = 0;
                 rs = pstmt_GENREID.executeQuery();
                 if (rs.next()) {
-                    genreID = rs.getInt("id");
+                    genreID = rs.getInt("mgid");
                 }
-
 
                 pstmt_3.setInt(1,mediaID);
                 pstmt_3.setInt(2,genreID);
@@ -209,14 +180,13 @@ public class MediaRepositoryC implements MediaRepository {
                 System.out.println("--------pstmt_3 ausgeführt---------");
 
                 System.out.println("Database Saved");
-                return media;
             }
+            return media;
 
         } catch (SQLException e) {
             //e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return media;
     }
 
     public List<String> getGenreName(int mediaId){

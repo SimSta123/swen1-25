@@ -8,6 +8,7 @@ import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.server.http.*;
+import at.technikum.server.util.TokenStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -28,26 +29,14 @@ public class UserController extends Controller {
 
         //Dass zu einer Switch-Case machen --> Geht nicht, switch(boolean) muss JDK 23 haben.
         if (request.getMethod().equals(Method.GET.getVerb())) {
-            if (request.getPath().equals("/api/users")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-                //return readAll();
-            }
-            System.out.println("GET: "+UrlID.urlID(request.getPath()));
+            if (request.getPath().equals("/api/users")) {return json("doesn't exist yet",Status.NOT_FOUND);}
             if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/profile")) {
                 //Hier soll die ID von der JSON oder von dem URL Path??
                 return read(UrlID.urlID(request.getPath()));
-                //return json("doesn't exist yet",Status.NOT_FOUND);
             }
-            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/ratings")) {
-                //return json("doesn't exist yet",Status.NOT_FOUND);
-                return ratingHistory(UrlID.urlID(request.getPath()));
-            }
-            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/favorites")) {
-                return getFav(UrlID.urlID((request.getPath())));
-            }
-            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/recommendations")) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-            }
+            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/ratings")) {return ratingHistory(request);}
+            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/favorites")) {return getFav(UrlID.urlID((request.getPath())));}
+            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/recommendations")&&request.getUri().contains("type=")) {return rec(request);}
             return json("doesn't exist yet, User.GET",Status.NOT_FOUND);
         }
 
@@ -74,14 +63,7 @@ public class UserController extends Controller {
         }
 
         if (request.getMethod().equals(Method.DELETE.getVerb())) {
-            System.out.println("try to go to delete");
-            System.out.println("DELETE: "+UrlID.urlID(request.getPath()));
-            //return json("doesn't exist yet, user.DELETE",Status.NOT_FOUND);
-            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/delete")) {
-                //Hier soll die ID von der JSON oder von dem URL Path??
-                System.out.println("try to start delete method");
-                return delete(UrlID.urlID(request.getPath()));
-            }
+            if (request.getPath().equals("/api/users/"+UrlID.urlID(request.getPath())+"/delete")) {return delete(UrlID.urlID(request.getPath()));}
             return json("doesn't exist yet",Status.NOT_FOUND);
         }
         return null;
@@ -158,9 +140,12 @@ public class UserController extends Controller {
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try {
+            //String auth = request.getHeader("Authorization");
             String token = authService.logIn(user);
             response.setStatus(Status.OK);
             response.setBody("user logged in"+" {token: "+ token+"}");
+            authService.tokenExists(token, false);
+
             response.setAuth(true);
             //Kein String token?????? SOll das irgendwo gepseichert werden?
             return json(response, Status.OK);
@@ -213,10 +198,14 @@ public class UserController extends Controller {
         return json(response, Status.NO_CONTENT);
     }
 
-    private Response ratingHistory(int id){
+    private Response ratingHistory(Request request){
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
+            int id = UrlID.urlID(request.getPath());
+            System.out.println("Auth:"+authService.tokenExists(request.getHeader("Authorization"),true));
+            if(!authService.tokenExists(request.getHeader("Authorization"),true)) throw new Exception("not authorized");
+            response.setAuth(true);
             List<Rating> rl = userService.ratingHistory(id);
 
             response.setContentType(ContentType.APPLICATION_JSON);
@@ -233,7 +222,7 @@ public class UserController extends Controller {
         }
     }
 
-    public Response getFav(int userId){
+    private Response getFav(int userId){
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
@@ -263,86 +252,34 @@ public class UserController extends Controller {
             return json(response, Status.BAD_REQUEST);
         }
     }
-}
 
-/*
-public class UserController extends Controller {
-
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @Override
-    public Response handle(Request request) {
-        String method = request.getMethod();
-        String path = request.getPath();
-
-        try {
-            if (method.equals(Method.GET.getVerb())) {
-                if (path.equals("/api/users")) return readAll();
-                if (path.matches("/api/users/\\d+/profile"))
-                    return read(UrlID.urlID(path));
-            }
-
-            if (method.equals(Method.POST.getVerb())) {
-                if (path.equals("/api/users/register")) return create(request);
-                if (path.equals("/api/users/login")) return logIn(request);
-            }
-
-            if (method.equals(Method.PUT.getVerb()) && path.matches("/api/users/\\d+/profile")) {
-                json("doesn't exist yet",Status.NOT_FOUND);
-                //return updateProfile(request);
-            }
-
-            if (method.equals(Method.DELETE.getVerb()) && path.matches("/api/users/\\d+")) {
-                json("doesn't exist yet",Status.NOT_FOUND);
-                return delete(UrlID.urlID(path));
-            }
-
-            // Standard: Nicht gefunden
-            return json("Endpoint not found", Status.NOT_FOUND);
-
+    private Response rec(Request request){
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try{
+            List<Media> media = userService.recs(request);
+            response.setStatus(Status.OK);
+            response.setContentType(ContentType.APPLICATION_JSON);
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(media);
+            response.setBody(jsonBody);
+            //response.setBody(media.toString());
+            return json(response, Status.OK);
+        } catch (EntityNotFoundException e){
+            System.out.println(e.getMessage());
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return json(response, Status.NOT_FOUND);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            response.setBody(e.getMessage());
+            return json(response, Status.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            return json(e.getMessage(), Status.BAD_REQUEST);
+            System.out.println(e.getMessage());
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody(e.getMessage());
+            return json(response, Status.BAD_REQUEST);
         }
-    }
-
-    private Response readAll() {
-        return json(userService.getAll(), Status.OK);
-    }
-
-    private Response read(int id) {
-        User user = userService.findByID(id);
-        return json(user, Status.OK);
-    }
-
-    private Response create(Request request) {
-        User user = toObject(request.getBody(), User.class);
-        user = userService.create(user);
-        return json(user, Status.CREATED);
-    }
-
-    private Response logIn(Request request) {
-        User user = toObject(request.getBody(), User.class);
-        boolean loggedIn = userService.logIn(user);
-
-        if (loggedIn) {
-            return json(Map.of("message", "user logged in", "token", userService.getToken(user)), Status.OK);
-        } else {
-            return json("Invalid credentials", Status.UNAUTHORIZED);
-        }
-    }
-
-    private Response updateProfile(Request request) {
-        return json("not implemented yet", Status.NOT_FOUND);
-    }
-
-    private Response delete(int id) {
-        userService.delete(id);
-        return json("User deleted", Status.NO_CONTENT);
     }
 }
-*/
-

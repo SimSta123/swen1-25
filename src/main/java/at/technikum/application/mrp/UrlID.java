@@ -58,6 +58,11 @@ public class UrlID {
         return contentType;
     }
 
+    public static String handleRecType(String queryParams) {
+        String contentType = extractQueryParam(queryParams, "type");
+        return contentType;
+    }
+
     // title
     public static String handleMediaTitle(String queryParams) {
         String title = extractQueryParam(queryParams, "title");

@@ -3,6 +3,7 @@ package at.technikum.application.mrp.user;
 import at.technikum.application.common.ConnectionPool;
 import at.technikum.application.mrp.media.Media;
 import at.technikum.application.mrp.rating.Rating;
+import at.technikum.application.todo.exception.EntityNotFoundException;
 
 import javax.sound.midi.SysexMessage;
 import java.sql.Connection;
@@ -45,6 +46,30 @@ public class UserRepositoryC implements UserRepository {
 
     private final String GET_GENRE_NAME
             = "SELECT genreName FROM genres WHERE mgid = ?";
+
+    private static final String REC_BY_GENRE
+            = " SELECT m.mediaid, m.title, m.description, m.creator_id, m.agerestriction, m.average_score, m.mediatype, m.releaseyear FROM media m JOIN media_genres mg ON mg.mediaid = m.mediaid " +
+            " WHERE mg.genreid IN (SELECT mg2.genreid FROM ratings r JOIN media_genres mg2 ON mg2.mediaid = r.mediaid WHERE r.userid = ? " +
+            "AND r.rating >= 4 ) AND m.mediaid NOT IN (SELECT mediaid FROM ratings WHERE userid = ?)";
+
+    private static final String REC_BY_CONTENT =
+            //mit """ geht ohne so wie oben
+            """
+            SELECT DISTINCT m2.mediaid, m2.title, m2.description, m2.creator_id, m2.agerestriction, m2.average_score, m2.mediatype, m2.releaseyear
+            FROM ratings r
+            JOIN media m1 ON m1.mediaid = r.mediaid
+            JOIN media_genres mg1 ON mg1.mediaid = m1.mediaid
+            JOIN media_genres mg2 ON mg2.genreid = mg1.genreid
+            JOIN media m2 ON m2.mediaid = mg2.mediaid
+            WHERE r.userid = ?
+              AND r.rating >= 4
+              AND m2.mediatype = m1.mediatype
+              AND m2.agerestriction <= m1.agerestriction
+              AND m2.mediaid <> m1.mediaid
+              AND m2.mediaid NOT IN (
+                  SELECT mediaid FROM ratings WHERE userid = ?
+              )
+            """;
 
     public UserRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -208,7 +233,6 @@ public class UserRepositoryC implements UserRepository {
                 PreparedStatement pstmt_2 = conn.prepareStatement(GET_GENRES_ID);
                 PreparedStatement pstmt_3 = conn.prepareStatement(GET_GENRE_NAME)
         ) {
-            System.out.println("D");
             pstmt.setInt(1, mediaId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -245,4 +269,60 @@ public class UserRepositoryC implements UserRepository {
             throw new RuntimeException(e);
         }
     }
+    public List<Media> recs(String type, int userId){
+        try(
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(REC_BY_GENRE);
+                PreparedStatement pstmt_2 = conn.prepareStatement(REC_BY_CONTENT);
+                PreparedStatement pstmt_GENREID = conn.prepareStatement(GET_GENRES_ID);
+                PreparedStatement pstmt_GENNAME = conn.prepareStatement(GET_GENRE_NAME);
+                )
+        {
+            List<Media> medias = new ArrayList<>();
+            ResultSet rs;
+            if(type.equals("genre")){
+                pstmt.setInt(1, userId);
+                pstmt.setInt(2, userId);
+                rs = pstmt.executeQuery();
+            }
+            else if(type.equals("content")){
+                pstmt_2.setInt(1, userId);
+                pstmt_2.setInt(2, userId);
+                rs = pstmt_2.executeQuery();
+            }
+            else throw new EntityNotFoundException("Unknown param given");
+            while (rs.next()) {
+                System.out.println("in while");
+                Media media = new Media(
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("mediaType"),
+                        Integer.parseInt(rs.getString("releaseYear")),
+                        Integer.parseInt(rs.getString("ageRestriction")),
+                        Integer.parseInt(rs.getString("creator_id")),
+                        Integer.parseInt(rs.getString("mediaID")),        //------------------------Umschreiben
+                        Double.parseDouble(rs.getString("average_score"))
+                );
+
+                List<String> genres = new ArrayList<>();
+                pstmt_GENREID.setInt(1, media.getMediaID());
+                ResultSet genreId = pstmt_GENREID.executeQuery();
+                while(genreId.next()){
+                    pstmt_GENNAME.setInt(1, genreId.getInt("genreId"));
+                    ResultSet genName = pstmt_GENNAME.executeQuery();
+                    while(genName.next()) {
+                        genres.add(genName.getString("genreName"));
+                    }
+                }
+                media.setGenre(genres);
+                medias.add(media);
+            }
+            return medias;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
 }

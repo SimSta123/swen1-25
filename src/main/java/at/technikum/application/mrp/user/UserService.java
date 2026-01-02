@@ -1,11 +1,13 @@
 package at.technikum.application.mrp.user;
 
+import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.authentification.AuthRepositoryC;
 import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.mrp.media.Media;
 import at.technikum.application.mrp.media.MediaService;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.todo.exception.*;
+import at.technikum.server.http.Request;
 
 import java.util.*;
 
@@ -17,39 +19,12 @@ public class UserService {
 
     public UserService(UserRepositoryC userRepositoryC) {
         this.userRepository = userRepositoryC;
-        //this.users = new ArrayList<>();
-        //this.auth = new AuthService();
     }
 
     //zum Testen
     public UserService() {
         this.userRepository = null;
         this.users = new ArrayList<>();
-    }
-
-    public User create(User user) {
-        // is user valid?
-        /*
-        System.out.println("try to create");
-        if(!AuthService.checkData(user)){
-            throw new IllegalArgumentException("Username or Password Illegal");
-        }
-        boolean unExists = users.stream()
-                .anyMatch(u -> u.getUsername().equals(user.getUsername()));
-        if(unExists){
-            throw new EntityNotFoundException("UserName already Exists");
-        }
-        user.setUUId(UUID.randomUUID().toString());
-        user.setId(users.size()+1);
-        user.setDone(true);
-        //UUID uuid = UUID.randomUUID();
-        //user.setUUId(uuid.toString());
-        users.add(user);
-        Optional<User> optionalUser = userRepository.save(user);
-        User savedUser = optionalUser.get();
-        return savedUser;
-         */
-        return null;
     }
 
     public User get(int id) {
@@ -129,6 +104,13 @@ public class UserService {
             throw new EntityNotFoundException("Keine Favs gefunden von diesem User");
         }
         return favs;
+    }
+
+    public List<Media> recs(Request request){
+        String type = UrlID.handleRecType(request.getUri());
+        System.out.println("recs: "+ type +", "+ request.getUri());
+        int uid = UrlID.urlID(request.getPath());
+        return userRepository.recs(type, uid);
     }
 }
 
