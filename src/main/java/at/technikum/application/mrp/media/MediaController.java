@@ -294,7 +294,7 @@ public class MediaController extends Controller {
             List<Media> ls = mediaService.search(request.getUri());
             System.out.println(ls.toString());
             ObjectMapper mapper = new ObjectMapper();
-            //String jsonBody = mapper.writeValueAsString(ls);
+            String jsonBody = mapper.writeValueAsString(ls);
             response.setBody(mapper.writeValueAsString(ls));
             //response.setBody();
             return json(response, Status.OK);

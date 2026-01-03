@@ -150,12 +150,12 @@ public class MediaSearchFilterRepository implements MediaRepository {
                 params.add("%" + title + "%");
             }
             if (genre != null) {
-                filter.append(" AND g.genrename ILIKE ?");
+                filter.append(" AND g.genrename = ?");
                 params.add(genre);
             }
             if (mediaType != null) {
                 filter.append(" AND m.mediatype = ?");
-                params.add("%" + mediaType + "%");
+                params.add(mediaType);
             }
             if (relYear != null) {
                 filter.append(" AND m.releaseyear = ?");
@@ -183,6 +183,7 @@ public class MediaSearchFilterRepository implements MediaRepository {
                         break;
                     case "ageRestriction":
                         filter.append("m.ageRestriction");
+                        break;
                     default:
                         filter.append("m.title");
                 }
@@ -210,6 +211,7 @@ public class MediaSearchFilterRepository implements MediaRepository {
                         rs.getInt("mediaid"),
                         rs.getInt("average_score")
                 );
+                System.out.println(media.toString());
                 result.add(media);
             }
             return result;
