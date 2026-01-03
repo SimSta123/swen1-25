@@ -16,10 +16,12 @@ public class MRPApplication implements Application {
     private final Router router;
     private final ExceptionMapper exceptionMapper;
     private final ConnectionPool connectionPool;
+    AuthService authService;
+
 
     public MRPApplication() {
         this.router = new Router();
-        router.setFallback(new NotFoundController());
+        router.setFallback(new NotFoundController(authService));
 
         this.connectionPool = new ConnectionPool(
                 "postgresql",
@@ -30,10 +32,12 @@ public class MRPApplication implements Application {
                 "mrpdb"
         );
 
-        router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool)),new AuthService(new AuthRepositoryC(connectionPool))));
-        router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool), new MediaSearchFilterRepository(connectionPool))));
-        router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC(connectionPool))));
-        router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC(connectionPool))));
+        authService = new AuthService(new AuthRepositoryC(connectionPool));
+
+        router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool)), authService));
+        router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool), new MediaSearchFilterRepository(connectionPool)), authService));
+        router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC(connectionPool)), authService));
+        router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC(connectionPool)), authService));
 
 
         this.exceptionMapper = new ExceptionMapper();

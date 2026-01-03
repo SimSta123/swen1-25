@@ -14,7 +14,7 @@ public class WeatherApplication implements Application {
     public WeatherApplication() {
         this.router = new Router();
 
-        this.router.addRoute("/city", new CityController());
+        //this.router.addRoute("/city", new CityController());
     }
 
     @Override

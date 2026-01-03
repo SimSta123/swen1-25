@@ -1,6 +1,7 @@
 package at.technikum.application.todo.controller;
 
 import at.technikum.application.common.Controller;
+import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.model.Todo;
 import at.technikum.application.todo.service.TodoService;
 import at.technikum.server.http.Method;
@@ -14,7 +15,8 @@ public class TodoController extends Controller {
 
     private final TodoService todoService;
 
-    public TodoController(TodoService todoService) {
+    public TodoController(TodoService todoService, AuthService authService) {
+        super(authService);
         this.todoService = todoService;
     }
 

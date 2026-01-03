@@ -2,6 +2,7 @@ package at.technikum.application.mrp.leaderboard;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
+import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.server.http.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,8 @@ public class LeaderboardController extends Controller {
 
     private final LeaderboardService leaderboardService;
 
-    public LeaderboardController(LeaderboardService leaderboardService) {
+    public LeaderboardController(LeaderboardService leaderboardService, AuthService authService) {
+        super(authService);
         this.leaderboardService = leaderboardService;
     }
 

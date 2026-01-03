@@ -77,11 +77,8 @@ public class LeaderboardRepositoryC implements LeaderboardRepository {
                 PreparedStatement pstmt = conn.prepareStatement(GET_ALL_RATINGS_ZWEI)
         ) {
             ResultSet rs = pstmt.executeQuery();
-            System.out.println("after Query");
             while (rs.next()) {
                 User user = new User();
-                user.setId(rs.getInt("userId"));
-
                 Leaderboard lb_2 = new Leaderboard(
                         user,
                         rs.getInt("ratingAnzahl")

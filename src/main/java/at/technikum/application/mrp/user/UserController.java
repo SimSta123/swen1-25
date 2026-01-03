@@ -18,10 +18,9 @@ import java.util.Map;
 public class UserController extends Controller {
 
     private final UserService userService;
-    private final AuthService authService;
     public UserController(UserService userService, AuthService authService) {
+        super(authService);
         this.userService = userService;
-        this.authService = authService;
     }
 
     @Override
@@ -203,7 +202,7 @@ public class UserController extends Controller {
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
             int id = UrlID.urlID(request.getPath());
-            System.out.println("Auth:"+authService.tokenExists(request.getHeader("Authorization"),true));
+            //System.out.println("Auth:"+authService.tokenExists(request.getHeader("Authorization"),true));
             if(!authService.tokenExists(request.getHeader("Authorization"),true)) throw new Exception("not authorized");
             response.setAuth(true);
             List<Rating> rl = userService.ratingHistory(id);

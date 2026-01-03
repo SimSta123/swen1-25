@@ -33,7 +33,6 @@ public class AuthService {
         if(!AuthService.checkData(user)){
             throw new IllegalArgumentException("Username or Password Illegal");
         }
-        System.out.println("Username and password passed verification");
         if(!authRepository.userLogIn(user)){
             throw new EntityNotFoundException("Username and/or password not found");    //oder UnauthorizedException 401?
         }
@@ -43,21 +42,16 @@ public class AuthService {
     }
 
     public static boolean checkData(User user){
-        System.out.println("checkData");
         if(user.getUsername() == null || user.getUsername().trim().equals("")) {
-            System.out.println("Username is empty");
             return false;
         } else if (user.getPassword() == null || user.getPassword().trim().equals("")) {
-            System.out.println("Password is empty");
             return false;
         } else {
-            System.out.println("Username and password are good");
             return true;
         }
     }
 
     public String createToken(User user){
-        System.out.println("createToken");
         String token = user.getUsername() + "-mrpToken";
         tokenStore.putToken(user.getUsername(), token);
         return token;
@@ -94,5 +88,11 @@ public class AuthService {
         System.out.println("Token: ---"+tokenStore.tokenExists(token));
         System.out.println(token);
         return tokenStore.tokenExists(token);
+    }
+
+    public int getUserId(String token){
+        String split = token.substring(7);
+        String[] userN = split.split("-");
+        return authRepository.getUserId(userN[0]);
     }
 }

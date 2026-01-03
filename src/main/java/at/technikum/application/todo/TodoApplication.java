@@ -23,8 +23,8 @@ public class TodoApplication implements Application {
     private final ConnectionPool connectionPool;
 
     private final TodoRepository todoRepository;
-    private final TodoService todoService;
-    private final TodoController todoController;
+    //private final TodoService todoService;
+    //private final TodoController todoController;
 
     public TodoApplication() {
         this.router = new Router();
@@ -39,10 +39,10 @@ public class TodoApplication implements Application {
         );
 
         this.todoRepository = new DbTodoRepository(connectionPool);
-        this.todoService = new TodoService(todoRepository);
-        this.todoController = new TodoController(todoService);
+        //this.todoService = new TodoService(todoRepository);
+        //this.todoController = new TodoController(todoService);
 
-        router.addRoute("/todos", todoController);
+        //router.addRoute("/todos", todoController);
         // router.addRoute("/todos", "GET", TodoController::readALL)
 
         this.exceptionMapper = new ExceptionMapper();

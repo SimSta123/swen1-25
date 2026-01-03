@@ -61,9 +61,6 @@ public class MediaRepositoryC implements MediaRepository {
     private final String FAV_EXISTST
             = "SELECT * FROM favorites WHERE mediaId = ? AND userId = ?";
 
-    private final String SELECT_RATING
-            = "SELECT rating FROM ratings WHERE mediaId = ?";
-
     private final String GET_GENRE_NAME
             = "SELECT genreName from genres WHERE mgid = ?";
 
@@ -115,11 +112,11 @@ public class MediaRepositoryC implements MediaRepository {
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("mediaType"),
-                        Integer.parseInt(rs.getString("releaseYear")),
-                        Integer.parseInt(rs.getString("ageRestriction")),
-                        Integer.parseInt(rs.getString("creator_id")),
-                        Integer.parseInt(rs.getString("mediaID")),
-                        Integer.parseInt(rs.getString("average_score"))
+                        rs.getInt("releaseYear"),
+                        rs.getInt("ageRestriction"),
+                        rs.getInt("creator_id"),
+                        rs.getInt("mediaID"),
+                        rs.getInt("average_score")
                 );
                 medias.add(media);
             }
@@ -207,18 +204,6 @@ public class MediaRepositoryC implements MediaRepository {
         }
     }
 
-    public void createGenre(Media media){
-        try (
-                Connection conn = connectionPool.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(CREATE);
-        ){
-
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public Media delete(int id) {
         try (
@@ -245,7 +230,6 @@ public class MediaRepositoryC implements MediaRepository {
                 PreparedStatement pstmt = conn.prepareStatement(UPDATE_MEDIA);
                 )
         {
-            System.out.println("trying to save media");
             pstmt.setString(1, media.getTitle());
             pstmt.setString(2, media.getDescription());
             pstmt.setString(3, media.getMediaType());

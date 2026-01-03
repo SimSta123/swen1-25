@@ -2,6 +2,7 @@ package at.technikum.application.mrp.rating;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
+import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.server.http.*;
 
@@ -12,7 +13,8 @@ public class RatingController extends Controller {
 
     private final RatingService ratingService;
 
-    public RatingController(RatingService ratingService) {
+    public RatingController(RatingService ratingService, AuthService authService) {
+        super(authService);
         this.ratingService = ratingService;
     }
 

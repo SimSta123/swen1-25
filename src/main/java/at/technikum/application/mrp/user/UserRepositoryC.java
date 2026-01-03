@@ -53,7 +53,7 @@ public class UserRepositoryC implements UserRepository {
             "AND r.rating >= 4 ) AND m.mediaid NOT IN (SELECT mediaid FROM ratings WHERE userid = ?)";
 
     private static final String REC_BY_CONTENT =
-            //mit """ geht ohne so wie oben
+            //mit """ geht ohne so wie oben, why so bloated?
             """
             SELECT DISTINCT m2.mediaid, m2.title, m2.description, m2.creator_id, m2.agerestriction, m2.average_score, m2.mediatype, m2.releaseyear
             FROM ratings r
@@ -92,7 +92,7 @@ public class UserRepositoryC implements UserRepository {
             User user = new User(
                     rs.getString("username"),
                     rs.getString("password"),
-                    Integer.parseInt(rs.getString("id"))
+                    rs.getInt("id")
             );
             return Optional.of(user);
         } catch (SQLException e) {
@@ -116,7 +116,7 @@ public class UserRepositoryC implements UserRepository {
                     User user = new User(
                             rs.getString("username"),
                             rs.getString("password"),
-                            Integer.parseInt(rs.getString("id"))
+                            rs.getInt("id")
                     );
                     users.add(user);
                 }
@@ -194,7 +194,6 @@ public class UserRepositoryC implements UserRepository {
                 rating.setComment(rs.getString("comment"));
                 rating.setTimeStamp(rs.getTimestamp("created_at").toString());
                 rating.setConfirmed(rs.getBoolean("commentconfirmed"));
-                System.out.println(rating.toString());
                 ratingList.add(rating);
             }
             return ratingList;
@@ -210,14 +209,11 @@ public class UserRepositoryC implements UserRepository {
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(FAVS_BY_USER_ID);
                 ){
-            System.out.println("A");
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
             List<Integer> mIds = new ArrayList<>();
             while (rs.next()) {
-                System.out.println("B");
                 mIds.add(rs.getInt("mediaId"));
-                System.out.println("C");
             }
             return mIds;
         } catch (SQLException e) {
@@ -240,13 +236,12 @@ public class UserRepositoryC implements UserRepository {
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("mediaType"),
-                        Integer.parseInt(rs.getString("releaseYear")),
-                        Integer.parseInt(rs.getString("ageRestriction")),
-                        Integer.parseInt(rs.getString("creator_id")),
-                        Integer.parseInt(rs.getString("mediaID"))
+                        rs.getInt("releaseYear"),
+                        rs.getInt("ageRestriction"),
+                        rs.getInt("creator_id"),
+                        rs.getInt("mediaID")
                 );
 
-                System.out.println("E");
                 pstmt_2.setInt(1, mediaId);
                 ResultSet mediaGenres = pstmt_2.executeQuery();
                 List<String> genres = new ArrayList<>();
@@ -292,15 +287,14 @@ public class UserRepositoryC implements UserRepository {
             }
             else throw new EntityNotFoundException("Unknown param given");
             while (rs.next()) {
-                System.out.println("in while");
                 Media media = new Media(
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("mediaType"),
-                        Integer.parseInt(rs.getString("releaseYear")),
-                        Integer.parseInt(rs.getString("ageRestriction")),
-                        Integer.parseInt(rs.getString("creator_id")),
-                        Integer.parseInt(rs.getString("mediaID")),        //------------------------Umschreiben
+                        rs.getInt("releaseYear"),
+                        rs.getInt("ageRestriction"),
+                        rs.getInt("creator_id"),
+                        rs.getInt("mediaId"),
                         Double.parseDouble(rs.getString("average_score"))
                 );
 

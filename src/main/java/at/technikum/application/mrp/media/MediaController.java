@@ -2,6 +2,7 @@ package at.technikum.application.mrp.media;
 
 import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
+import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.user.User;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
@@ -21,7 +22,8 @@ public class MediaController extends Controller {
 
     private final MediaService mediaService;
 
-    public MediaController(MediaService mediaService) {
+    public MediaController(MediaService mediaService, AuthService authService) {
+        super(authService);
         this.mediaService = mediaService;
     }
 
@@ -128,6 +130,9 @@ public class MediaController extends Controller {
         response.setContentType(ContentType.TEXT_PLAIN);
         try {
             Media media = toObject(request.getBody(), Media.class);
+            //System.out.println("Auth:"+authService.tokenExists(request.getHeader("Authorization"),true));
+            if(!authService.tokenExists(request.getHeader("Authorization"),true)) throw new Exception("not authorized");
+            media.setCreatorID(authService.getUserId(request.getHeader("Authorization")));
             mediaService.create(media);
             System.out.println("after save");
             response.setStatus(Status.CREATED);

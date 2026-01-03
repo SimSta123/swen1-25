@@ -1,6 +1,7 @@
 package at.technikum.application.weather.controller;
 
 import at.technikum.application.common.Controller;
+import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.weather.model.Weather;
 import at.technikum.application.weather.service.WeatherService;
 import at.technikum.server.http.ContentType;
@@ -12,7 +13,8 @@ public class CityController extends Controller {
 
     private final WeatherService weatherService;
 
-    public CityController() {
+    public CityController(AuthService authService) {
+        super(authService);
         this.weatherService = new WeatherService();
     }
 

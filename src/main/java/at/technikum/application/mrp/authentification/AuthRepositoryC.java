@@ -27,6 +27,9 @@ public class AuthRepositoryC {
     private final String USERNAME_EXISTS
             = "SELECT * FROM users WHERE username = ?";
 
+    private final String GET_USERID
+            = "SELECT id FROM users WHERE username = ?";
+
     public AuthRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
@@ -62,6 +65,23 @@ public class AuthRepositoryC {
                 return true;
             } else {
                 return false;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getUserId(String username) {
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(GET_USERID);
+        ) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()) {
+                return rs.getInt("id");
+            } else {
+                throw new SQLException("user not found");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

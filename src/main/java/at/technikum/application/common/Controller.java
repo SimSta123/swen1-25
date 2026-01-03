@@ -1,5 +1,6 @@
 package at.technikum.application.common;
 
+import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.exception.JsonConversionException;
 import at.technikum.application.todo.exception.NotJsonBodyException;
 import at.technikum.server.http.ContentType;
@@ -11,6 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class Controller {
 
     public abstract Response handle(Request request);
+    protected final AuthService authService;            //protected und final, damit alle danach immer die gleiche benutzen
+
+    protected Controller(AuthService authService) {
+        this.authService = authService;
+    }
 
     protected <T> T toObject(String content, Class<T> valueType) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -54,5 +60,15 @@ public abstract class Controller {
         response.setBody(body);
 
         return response;
+    }
+
+    protected int authAndGetUserId(Request request) {
+        String header = request.getHeader("Authorization");
+
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("No token found");
+        }
+
+        return authService.getUserId(header.substring("Bearer ".length()));
     }
 }
