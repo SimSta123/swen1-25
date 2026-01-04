@@ -4,6 +4,7 @@ import at.technikum.application.mrp.rating.Rating;
 import at.technikum.application.mrp.rating.RatingService;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
+import at.technikum.application.todo.exception.NotAuthorizedException;
 import at.technikum.server.http.Request;
 
 import java.util.ArrayList;
@@ -47,14 +48,12 @@ public class MediaService {
     }
 
     public boolean update(Media update, int mediaID) {
-        //Media media = mediaRepository.find(update.getMediaID())
-        //        .orElseThrow(EntityNotFoundException::new);
+        Media media = mediaRepository.find(mediaID)
+                .orElseThrow(EntityNotFoundException::new);
+        if(media.getCreatorID()!= update.getCreatorID()) throw new NotAuthorizedException("User not Creator of Media, not Authorized");
 
-        //media.setTitle(update.getTitle());
-        //media.setDone(update.isDone());
         System.out.println("MediaUpdate, mediaID:"+mediaID+" creatorID: "+update.getCreatorID());
-        boolean done = mediaRepository.update(update, mediaID);
-        return true;
+        return mediaRepository.update(update, mediaID);
     }
 
     public Media delete(String title) {
@@ -64,17 +63,13 @@ public class MediaService {
 
     public boolean deleteByID(int creatorId, int mediaId) {
         //if(creatorId<1) throw new IllegalArgumentException("creatorID ungültig"); //sollte ja nach userId gehen
-        System.out.println("deleteByID MediaService");
         Optional<Media> mediaOpt = mediaRepository.find(mediaId);
-        //if(assertTrue(mediaOpt.isEmpty())) new EntityNotFoundException("MediaID not found");
-        System.out.println("Optional<Media>->Media");
+        //if(mediaOpt.isEmpty()) new EntityNotFoundException("MediaID not found");
         Media media = mediaOpt.orElseThrow(
                 () -> new EntityNotFoundException("MediaID not found")
         );
-        System.out.println("CreatorID==CreatorID??||MediaID:" + media.getMediaID());
         if (media.getCreatorID() != creatorId) {
-            System.out.println("Not the creator");
-            throw new IllegalArgumentException("Not the creator");
+            throw new IllegalArgumentException("Not the creator, not Authorized");
         } else {
             mediaRepository.delete(mediaId);
             return true;

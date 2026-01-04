@@ -46,6 +46,7 @@ public class MRPApplication implements Application {
         this.exceptionMapper.register(JsonConversionException.class, Status.INTERNAL_SERVER_ERROR);
         this.exceptionMapper.register(DuplicateAlreadyExistsException.class, Status.CONFLICT);
         this.exceptionMapper.register(RouteNotFoundException.class, Status.NOT_FOUND);
+        this.exceptionMapper.register(NotAuthorizedException.class, Status.UNAUTHORIZED);
     }
 
     @Override

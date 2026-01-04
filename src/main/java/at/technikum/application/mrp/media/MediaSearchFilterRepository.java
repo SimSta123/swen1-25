@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class MediaSearchFilterRepository implements MediaRepository {
+public class MediaSearchFilterRepository {
 
     private final ConnectionPool connectionPool;
 
@@ -37,26 +37,6 @@ public class MediaSearchFilterRepository implements MediaRepository {
 
     public MediaSearchFilterRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
-    }
-
-    @Override
-    public Optional<Media> find(int id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Media> findAll() {
-        return List.of();
-    }
-
-    @Override
-    public Media save(Media media) {
-        return null;
-    }
-
-    @Override
-    public Media delete(int id) {
-        return null;
     }
 
     public List<Media> findAll(String title) {

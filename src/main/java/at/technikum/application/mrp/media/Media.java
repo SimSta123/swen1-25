@@ -7,23 +7,15 @@ import java.util.List;
 
 public class Media {
 
-    /*
-    private boolean movie;
-    private boolean series;
-    private boolean game;
-     */
     private String title;
     private String description;
     private String mediaType;
     private int releaseYear;
     private List<String> genre = new ArrayList<>();
     private int ageRestriction;
-    private String creatorUUID;
     private double averageRating = 0.0;
-    private boolean isDone;
     private int mediaID;
     private int creatorID;
-    //private List<String> type;
 
     public String getTitle() {
         return title;
@@ -73,28 +65,12 @@ public class Media {
         this.ageRestriction = ageRestriction;
     }
 
-    public String getCreatorUUID() {
-        return creatorUUID;
-    }
-
-    public void setCreatorUUID(String creatorUUID) {
-        this.creatorUUID = creatorUUID;
-    }
-
     public double getAverageRating() {
         return averageRating;
     }
 
     public void setAverageRating(double averageRating) {
         this.averageRating = averageRating;
-    }
-
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean done) {
-        isDone = done;
     }
 
     public void setMediaID(int mediaID) {
@@ -112,6 +88,14 @@ public class Media {
     }
 
     public Media(){}
+
+    public Media(String title, String description, String mediaType, int releaseYear, int ageRestriction){
+        this.title = title;
+        this.description = description;
+        this.mediaType = mediaType;
+        this.releaseYear = releaseYear;
+        this.ageRestriction = ageRestriction;
+    }
 
     public Media(String title, String description, String mediaType, int releaseYear, int ageRestriction, int creatorID){
         this.title = title;

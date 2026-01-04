@@ -51,7 +51,7 @@ public class RatingService {
     }
 
     public boolean like(int ratingId, int userId){
-        if(!ratingRepository.ratingExists(ratingId, userId)){
+        if(ratingRepository.ratingExists(ratingId, userId)){
             throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
         }
 

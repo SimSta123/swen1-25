@@ -4,6 +4,7 @@ import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
+import at.technikum.application.todo.exception.NotAuthorizedException;
 import at.technikum.server.http.*;
 
 import java.util.DuplicateFormatFlagsException;
@@ -35,7 +36,7 @@ public class RatingController extends Controller {
             }
             if (request.getPath().equals("/api/ratings/"+id+"/like")) {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
-                return like(id);
+                return like(id,request);
             }
             if (request.getPath().equals("/api/ratings/"+id+"/confirm")) {
                // return json("doesn't exist yet",Status.NOT_FOUND);
@@ -147,20 +148,25 @@ public class RatingController extends Controller {
         }
     }
 
-    private Response like(int ratingId){
+    private Response like(int ratingId, Request request){
         //später durch aktuellen authentifizierten User ersetzen
-        int userId = 1;
+        int userId = getUserId(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
+            auth(request);
             boolean done = ratingService.like(ratingId, userId);
             response.setStatus(Status.CREATED);
-            response.setBody("done: true, ratingId: "+ratingId + ", userId: "+ userId);
+            response.setBody("done: +"+done+", ratingId: "+ratingId + ", userId: "+ userId);
             return json(response,Status.CREATED);
-        } catch (DuplicateAlreadyExistsException e){
+        } catch (DuplicateAlreadyExistsException e) {
             response.setStatus(Status.CONFLICT);
-            response.setBody("done: false, ratingId: "+ratingId + ", userId: "+ userId+ ", err: rating does not exist");
-            return json(response,Status.CONFLICT);
+            response.setBody("done: false, ratingId: " + ratingId + ", userId: " + userId + ", err: rating does not exist");
+            return json(response, Status.CONFLICT);
+        } catch (NotAuthorizedException e){
+                response.setStatus(Status.UNAUTHORIZED);
+                response.setBody("err: unauthorized");
+                return json(response,Status.UNAUTHORIZED);
         } catch (Exception e){
             response.setStatus(Status.CONFLICT);
             response.setBody("done: false, ratingId: "+ratingId + ", userId: "+ userId+ ", err: " + e.getMessage());

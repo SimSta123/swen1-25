@@ -204,6 +204,7 @@ public class UserController extends Controller {
             int id = UrlID.urlID(request.getPath());
             //System.out.println("Auth:"+authService.tokenExists(request.getHeader("Authorization"),true));
             if(!authService.tokenExists(request.getHeader("Authorization"),true)) throw new Exception("not authorized");
+
             response.setAuth(true);
             List<Rating> rl = userService.ratingHistory(id);
 
@@ -226,17 +227,15 @@ public class UserController extends Controller {
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
             List<Media> media = userService.getAllFavs(userId);
-            response.setStatus(Status.OK);
-            //response.setContentType(ContentType.TEXT_PLAIN);
-            response.setContentType(ContentType.APPLICATION_JSON);
-            //????
+            response.setStatus(Status.OK);  //Wenn ObjectManager dann muss status davor gesetzt werden
+            //response.setContentType(ContentType.APPLICATION_JSON);
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = mapper.writeValueAsString(media);
             response.setBody(jsonBody);
             return json(response, Status.OK);
         } catch (EntityNotFoundException e){
             System.out.println(e.getMessage());
-            response.setStatus(Status.NOT_FOUND);
+            response.setStatus(Status.NOT_FOUND);   //wenn nicht da, dann wird status nicht gesetzt --> Socket hangup
             response.setBody(e.getMessage());
             return json(response, Status.NOT_FOUND);
         } catch (RuntimeException e) {

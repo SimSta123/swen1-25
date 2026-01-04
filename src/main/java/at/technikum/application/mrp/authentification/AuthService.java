@@ -91,8 +91,21 @@ public class AuthService {
     }
 
     public int getUserId(String token){
-        String split = token.substring(7);
-        String[] userN = split.split("-");
+        String split;
+        String[] userN;
+        if(token.contains("Bearer ")) {
+            split = token.substring("Bearer ".length());
+            userN = split.split("-");
+        } else {
+            userN = token.split("-");
+        }
         return authRepository.getUserId(userN[0]);
     }
+
+    //Brauche ich eigentlich nicht, soll die id vom URL nehmen und schauen ob diese mit der UID übereinstimmt
+    /*
+    public boolean correctId(int id, String token){
+        return id==getUserId(token);
+    }
+     */
 }

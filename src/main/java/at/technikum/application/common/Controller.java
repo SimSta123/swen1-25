@@ -2,6 +2,7 @@ package at.technikum.application.common;
 
 import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.exception.JsonConversionException;
+import at.technikum.application.todo.exception.NotAuthorizedException;
 import at.technikum.application.todo.exception.NotJsonBodyException;
 import at.technikum.server.http.ContentType;
 import at.technikum.server.http.Request;
@@ -62,13 +63,23 @@ public abstract class Controller {
         return response;
     }
 
-    protected int authAndGetUserId(Request request) {
+    protected int getUserId(Request request) {
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
             throw new IllegalArgumentException("No token found");
         }
-
+        /*
+        if(!authService.tokenExists(header, true)){
+            throw new NotAuthorizedException("User not AUthorized");
+        }
+        */
         return authService.getUserId(header.substring("Bearer ".length()));
+    }
+
+    protected void auth(Request request){
+        if(!authService.tokenExists(request.getHeader("Authorization"), true)) {
+            throw new NotAuthorizedException("User not Authorized");
+        }
     }
 }

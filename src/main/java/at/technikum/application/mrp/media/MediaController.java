@@ -4,18 +4,12 @@ import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.mrp.rating.Rating;
-import at.technikum.application.mrp.user.User;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
 import at.technikum.application.todo.exception.EntityNotFoundException;
+import at.technikum.application.todo.exception.NotAuthorizedException;
 import at.technikum.server.http.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.sound.midi.SysexMessage;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 public class MediaController extends Controller {
@@ -125,23 +119,26 @@ public class MediaController extends Controller {
 
     //Korrekte ERRORCODES!!!!!!!!!!!!!
     private Response create(Request request) {
-        System.out.println("in MediaController");
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try {
             Media media = toObject(request.getBody(), Media.class);
             //System.out.println("Auth:"+authService.tokenExists(request.getHeader("Authorization"),true));
-            if(!authService.tokenExists(request.getHeader("Authorization"),true)) throw new Exception("not authorized");
+            //if(!authService.tokenExists(request.getHeader("Authorization"),true)) throw new Exception("not authorized");
+            auth(request);
             media.setCreatorID(authService.getUserId(request.getHeader("Authorization")));
             mediaService.create(media);
-            System.out.println("after save");
             response.setStatus(Status.CREATED);
             response.setBody("done");
             return json(response, Status.CREATED);
-        } catch(DuplicateAlreadyExistsException e){
+        } catch(DuplicateAlreadyExistsException e) {
             response.setStatus(Status.CONFLICT);
             response.setBody("This media already exists");
-            return json(response,Status.CONFLICT);
+            return json(response, Status.CONFLICT);
+        } catch (NotAuthorizedException e){
+            response.setStatus(Status.UNAUTHORIZED);
+            response.setBody("User not Authorized");
+            return json(response, Status.UNAUTHORIZED);
         } catch (Exception e){
             response.setStatus(Status.BAD_REQUEST);
             response.setBody(e.getMessage());
@@ -150,25 +147,31 @@ public class MediaController extends Controller {
     }
 
     private Response update(Request request, int id) {
-        System.out.println("in MediaUpdate");
-        try{
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
+        try {
+            auth(request);
             Media update = toObject(request.getBody(), Media.class);
-            System.out.println("media creatorID:"+update.getCreatorID());
+            update.setCreatorID(getUserId(request));
             boolean done = mediaService.update(update, id);
-            Response response = new Response();
             response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
-            if(done){
-                response.setBody("done: "+done+", updated MediaID: "+id);
+            if (done) {
+                response.setBody("done: " + done + ", updated MediaID: " + id);
                 return json(response, Status.OK);
             } else {
-                response.setBody("done: "+done+", tried to update MediaID: "+id);
+                response.setBody("done: " + done + ", tried to update MediaID: " + id);
                 return json(response, Status.BAD_REQUEST);
             }
+        } catch (NotAuthorizedException e) {
+            response.setStatus(Status.UNAUTHORIZED);
+            response.setBody("User not Authorized");
+            return json(response, Status.UNAUTHORIZED);
+        } catch (EntityNotFoundException e) {
+            response.setStatus(Status.NOT_FOUND);
+            response.setBody("MediaID to Update not found");
+            return json(response, Status.NOT_FOUND);
         } catch (Exception e){
-            Response response = new Response();
             response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
             response.setBody(e.getMessage());
             System.out.println(e.getMessage());
             return json(response, Status.BAD_REQUEST);
@@ -176,12 +179,12 @@ public class MediaController extends Controller {
     }
 
     private Response delete(Request request, int mediaId) {
+        Response response = new Response();
+        response.setContentType(ContentType.TEXT_PLAIN);
         try{
-            Media media = toObject(request.getBody(), Media.class);
-            boolean done = mediaService.deleteByID(media.getCreatorID(), mediaId);
-            Response response = new Response();
+            auth(request);
+            boolean done = mediaService.deleteByID(getUserId(request), mediaId);
             response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
             if(done){
                 response.setBody("done: "+done+", deleted MediaID: "+mediaId);
                 return json(response, Status.OK);
@@ -189,10 +192,12 @@ public class MediaController extends Controller {
                 response.setBody("done: "+done+", tried to deleted MediaID: "+mediaId);
                 return json(response, Status.BAD_REQUEST);
             }
+        } catch (NotAuthorizedException e){
+            response.setStatus(Status.UNAUTHORIZED);
+            response.setBody("User not Authorized");
+            return json(response, Status.UNAUTHORIZED);
         } catch (Exception e){
-            Response response = new Response();
             response.setStatus(Status.OK);
-            response.setContentType(ContentType.TEXT_PLAIN);
             response.setBody(e.getMessage());
             System.out.println(e.getMessage());
             return json(response, Status.BAD_REQUEST);
