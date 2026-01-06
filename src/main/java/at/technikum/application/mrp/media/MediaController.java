@@ -47,7 +47,7 @@ public class MediaController extends Controller {
                 return create(request);
                 //return json("doesnt exist yet", Status.NOT_FOUND);
             } else if(request.getPath().equals("/api/media/"+id+"/favorite")) {
-                return fav(id);
+                return fav(id, request);
             } else if(request.getPath().equals("/api/media/"+id+"/rate")) {
                 return rate(request,id);
             } else {
@@ -68,7 +68,7 @@ public class MediaController extends Controller {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
                 return delete(request, id);
             } if(request.getPath().equals("/api/media/"+id+"/favorite")) {
-                return favDelete(id);
+                return favDelete(id, request);
             } else {
                 return json("doesn't exist yet", Status.NOT_FOUND);
             }
@@ -206,16 +206,17 @@ public class MediaController extends Controller {
 
     //Hier oder im RatingService??
     private Response rate(Request request, int mediaId) {
-        //Später ändern das der aktuelle Authenthifizierte user genommen wird
-
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
-        try{
+        //try{
+            auth(request);
             Rating rating = toObject(request.getBody(), Rating.class);
+            rating.setCreatorId(getUserId(request));
             boolean done = mediaService.createRating(rating, mediaId);
             response.setBody("done: "+done+", rating on mediaId: "+mediaId);
             response.setStatus(Status.CREATED);
             return json(response,Status.CREATED);
+            /*
         } catch (EntityNotFoundException e) {
             System.out.println(e.getMessage());
             response.setStatus(Status.NOT_FOUND);
@@ -227,10 +228,12 @@ public class MediaController extends Controller {
             System.out.println(e.getMessage());
             return json(response, Status.BAD_REQUEST);
         }
+        */
     }
 
-    private Response fav(int mediaId){
-        int userId = 1;
+    private Response fav(int mediaId, Request request){
+        auth(request);
+        int userId = getUserId(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
@@ -261,8 +264,9 @@ public class MediaController extends Controller {
         }
     }
 
-    private Response favDelete(int mediaId){
-        int userId = 1;
+    private Response favDelete(int mediaId, Request request){
+        auth(request);
+        int userId = getUserId(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{

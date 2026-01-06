@@ -10,9 +10,7 @@ import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.server.http.*;
 import at.technikum.server.util.TokenStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
-import java.util.Map;
 
 
 public class UserController extends Controller {
@@ -41,12 +39,10 @@ public class UserController extends Controller {
 
         if (request.getMethod().equals(Method.POST.getVerb())) {
             if (request.getPath().equals("/api/users/register")) {
-                System.out.println("try to go to create");
                 return create(request);
             }
             //Braucht man hier ein request zum login??? Wegen login daten??
             if (request.getPath().equals("/api/users/login")) {
-                System.out.println("try to go to login");
                 return logIn(request);
             }
             return json("doesn't exist yet, User.POST",Status.NOT_FOUND);
@@ -55,8 +51,8 @@ public class UserController extends Controller {
         if (request.getMethod().equals(Method.PUT.getVerb())) {
             String path = "/api/users/"+UrlID.urlID(request.getPath())+"/profile";
             if (request.getPath().equals(path)) {
-                return json("doesn't exist yet",Status.NOT_FOUND);
-                //return read(UrlID.urlID(request.getPath()));
+                //return json("doesn't exist yet",Status.NOT_FOUND);
+                return update(request, UrlID.urlID(request.getPath()));
             }
             return json("doesn't exist yet",Status.NOT_FOUND);
         }
@@ -88,10 +84,10 @@ public class UserController extends Controller {
             //gUser = userService.findByUsername(user.getUsername());
             System.out.println("in READ");
             gUser = userService.get(ID);
-
             response.setStatus(Status.OK);
             String body = "User found: Username: " + gUser.getUsername()+ ", PW:"+gUser.getPassword()+", ID: "+gUser.getId();
-            response.setBody(body);
+            String body2 = ", anzahl favs: "+userService.favNumber(ID)+", anzahl medias created: "+userService.mediaNumber(ID)+", anzahl ratings: "+userService.ratingNumber(ID);
+            response.setBody(body+body2);
             return json(response, Status.OK);
         }  catch (EntityNotFoundException e){
             response.setStatus(Status.NOT_FOUND);
@@ -112,7 +108,6 @@ public class UserController extends Controller {
         User user = toObject(request.getBody(), User.class);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
-
         try {
             boolean done = authService.createUser(user);
             response.setStatus(Status.CREATED);
@@ -156,6 +151,7 @@ public class UserController extends Controller {
     }
 
     private Response update(Request request, int userId) {
+        auth(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
@@ -255,7 +251,9 @@ public class UserController extends Controller {
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         try{
-            List<Media> media = userService.recs(request);
+            String type = UrlID.handleRecType(request.getUri());
+            int uid = UrlID.urlID(request.getPath());
+            List<Media> media = userService.recs(type, uid);
             response.setStatus(Status.OK);
             response.setContentType(ContentType.APPLICATION_JSON);
             ObjectMapper mapper = new ObjectMapper();

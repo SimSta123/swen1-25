@@ -35,7 +35,8 @@ public class MRPApplication implements Application {
         authService = new AuthService(new AuthRepositoryC(connectionPool));
 
         router.addRoute("/api/user", new UserController(new UserService(new UserRepositoryC(connectionPool)), authService));
-        router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool), new MediaSearchFilterRepository(connectionPool)), authService));
+        //router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool), new MediaSearchFilterRepository(connectionPool)), authService));
+        router.addRoute("/api/media", new MediaController(new MediaService(new MediaRepositoryC(connectionPool)), authService));
         router.addRoute("/api/rating", new RatingController(new RatingService(new RatingRepositoryC(connectionPool)), authService));
         router.addRoute("/api/leaderboard", new LeaderboardController(new LeaderboardService(new LeaderboardRepositoryC(connectionPool)), authService));
 
@@ -57,9 +58,10 @@ public class MRPApplication implements Application {
 
             return controller.handle(request);
         } catch (Exception ex) {
-           Response r = new Response();
-           r.setBody(ex.getMessage());
-            return r;
+           //Response r = new Response();
+           //r.setBody(ex.getMessage());
+            return exceptionMapper.toResponse(ex);
+            //return r;
         }
         //return null;
     }

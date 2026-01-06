@@ -32,36 +32,35 @@ public class RatingService {
     }
 
     public void update(Rating update, int userId) {
-        //System.out.println("Rating exists:" +ratingRepository.ratingExistsById(update.getId()));
-        if(!ratingRepository.ratingExistsById(update.getId())){
-            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ update.getMediaId()+ ", does not Exist");
+        if(ratingRepository.ratingExistsById(update.getId(), userId)){
+            throw new EntityNotFoundException("Rating with userId: "+ userId+ ", and mediaId: "+ update.getMediaId()+ ", does not Exist");
         }
 
         ratingRepository.update(update, userId);
     }
 
     public boolean delete(int ratingId, int userId) {
-        System.out.println("exists:"+ratingRepository.ratingExistsById(ratingId));
-        if(ratingRepository.ratingExistsById(ratingId)==false){
-            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
+        if(!ratingRepository.ratingExistsById(ratingId, userId)){
+            throw new EntityNotFoundException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
         }
-        System.out.println("here");
 
         return ratingRepository.delete(ratingId, userId);
     }
 
     public boolean like(int ratingId, int userId){
-        if(ratingRepository.ratingExists(ratingId, userId)){
-            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
+        //soll hier true oder falls sein?
+        if(!ratingRepository.ratingExists(ratingId)){
+            throw new EntityNotFoundException("Rating with ratingId: "+ ratingId+ ", does not Exist");
         }
 
         return ratingRepository.like(ratingId, userId);
     }
 
     public boolean confirm(int ratingId, int userId){
-        if(!ratingRepository.ratingExists(ratingId, userId)){
-            throw new DuplicateAlreadyExistsException("Rating with userId: "+ userId+ ", and mediaId: "+ ratingId+ ", does not Exist");
+        if(!ratingRepository.ratingExistsById(ratingId, userId)){
+            throw new EntityNotFoundException("Rating with ratingId:"+ratingId+" doesnt exist");
         }
+
         return ratingRepository.confirm(ratingId,userId);
     }
 }

@@ -19,6 +19,9 @@ public class ExceptionMapper {
     public Response toResponse(Exception exception) {
         Response response = new Response();
 
+        if (exception instanceof RuntimeException) {
+            System.out.println("Caught RuntimeException: " + exception.getClass().getName());
+        }
 
         if (exception instanceof EntityNotFoundException) {
             response.setStatus(Status.NOT_FOUND);
@@ -72,6 +75,13 @@ public class ExceptionMapper {
             return response;
         }
 
+        if (exception instanceof EntityNotFoundException){
+            response.setStatus(Status.NOT_FOUND);
+            response.setContentType(ContentType.TEXT_PLAIN);
+            response.setBody(exception.getMessage());
+            return response;
+        }
+
         Status status = map.get(exception.getClass());
         if (null == status) {
             status = Status.INTERNAL_SERVER_ERROR;
@@ -79,7 +89,7 @@ public class ExceptionMapper {
 
         response.setStatus(status);
         response.setContentType(ContentType.TEXT_PLAIN);
-        response.setBody(exception.getMessage());
+        response.setBody("An unexpected error occurred: " + exception.getMessage());
 
         return response;
     }

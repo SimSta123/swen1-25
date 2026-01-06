@@ -4,6 +4,7 @@ import at.technikum.application.common.Controller;
 import at.technikum.application.mrp.UrlID;
 import at.technikum.application.mrp.authentification.AuthService;
 import at.technikum.application.todo.exception.DuplicateAlreadyExistsException;
+import at.technikum.application.todo.exception.EntityNotFoundException;
 import at.technikum.application.todo.exception.NotAuthorizedException;
 import at.technikum.server.http.*;
 
@@ -31,8 +32,8 @@ public class RatingController extends Controller {
 
         if (request.getMethod().equals(Method.POST.getVerb())) {
             if (request.getPath().equals("/api/ratings/"+id+"/rate")) {
-                //return json("doesn't exist yet",Status.NOT_FOUND);
-                return create(request,id);
+                return json("doesn't exist yet",Status.NOT_FOUND);
+                //return create(request,id);
             }
             if (request.getPath().equals("/api/ratings/"+id+"/like")) {
                 //return json("doesn't exist yet",Status.NOT_FOUND);
@@ -40,7 +41,7 @@ public class RatingController extends Controller {
             }
             if (request.getPath().equals("/api/ratings/"+id+"/confirm")) {
                // return json("doesn't exist yet",Status.NOT_FOUND);
-                return confirm(id);
+                return confirm(id, request);
             }
             return json("doesn't exist yet",Status.NOT_FOUND);
         }
@@ -77,20 +78,21 @@ public class RatingController extends Controller {
      */
 
     private Response read() {
-
         return null;
 
     }
 
+    /*
     private Response create(Request request, int mediaId) {
-        //Später ändern das der aktuelle Authenthifizierte user genommen wird
+        auth(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         Rating rating = toObject(request.getBody(), Rating.class);
+        rating.setCreatorId(getUserId(request));
         try{
             boolean done = ratingService.create(rating, mediaId);
             response.setStatus(Status.OK);
-            response.setBody("done: true, created rating, mediaId: "+mediaId + ", userId: "+ rating.getCreatorId());
+            response.setBody("done: "+done+", created rating, mediaId: "+mediaId + ", userId: "+ rating.getCreatorId());
             return json(response,Status.OK);
         } catch (DuplicateAlreadyExistsException e){
             response.setStatus(Status.CONFLICT);
@@ -102,10 +104,12 @@ public class RatingController extends Controller {
             return json(response,Status.CONFLICT);
         }
     }
+     */
 
     private Response update(Request request, int ratingId) {
         //Später durch akutellen User ersetzen
-        int userId = 1;
+        auth(request);
+        int userId = getUserId(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
         Rating update = toObject(request.getBody(), Rating.class);
@@ -128,16 +132,17 @@ public class RatingController extends Controller {
     }
 
     private Response delete(Request request, int ratingId) {
-        int userId = 1;
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
+        auth(request);
+        int userId = getUserId(request);
         try{
             boolean done = ratingService.delete(ratingId, userId);
             System.out.println("geschaft");
             response.setStatus(Status.OK);
             response.setBody("done: "+done+", updated: ratingId: "+ratingId + ", userId: "+ userId);
             return json(response,Status.OK);
-        } catch (DuplicateAlreadyExistsException e){
+        } catch (EntityNotFoundException e){
             response.setStatus(Status.CONFLICT);
             response.setBody("done: false, update failed: ratingId: "+ ratingId + ", userId: "+ userId+ ", err: rating does not exist");
             return json(response,Status.CONFLICT);
@@ -150,41 +155,38 @@ public class RatingController extends Controller {
 
     private Response like(int ratingId, Request request){
         //später durch aktuellen authentifizierten User ersetzen
-        int userId = getUserId(request);
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
+        auth(request);
+        int userId = getUserId(request);
         try{
-            auth(request);
             boolean done = ratingService.like(ratingId, userId);
             response.setStatus(Status.CREATED);
             response.setBody("done: +"+done+", ratingId: "+ratingId + ", userId: "+ userId);
             return json(response,Status.CREATED);
-        } catch (DuplicateAlreadyExistsException e) {
+        } catch (EntityNotFoundException e) {
             response.setStatus(Status.CONFLICT);
-            response.setBody("done: false, ratingId: " + ratingId + ", userId: " + userId + ", err: rating does not exist");
+            response.setBody("done: false, ratingId: "+ratingId + ", userId: "+ userId+", err: rating does not exist");
             return json(response, Status.CONFLICT);
-        } catch (NotAuthorizedException e){
-                response.setStatus(Status.UNAUTHORIZED);
-                response.setBody("err: unauthorized");
-                return json(response,Status.UNAUTHORIZED);
         } catch (Exception e){
-            response.setStatus(Status.CONFLICT);
-            response.setBody("done: false, ratingId: "+ratingId + ", userId: "+ userId+ ", err: " + e.getMessage());
-            return json(response,Status.CONFLICT);
+            response.setStatus(Status.BAD_REQUEST);
+            response.setBody("done: false,  ratingId: "+ratingId + ", userId: "+ userId+", there was an error");
+            return json(response,Status.BAD_REQUEST);
         }
     }
 
-    private Response confirm(int ratingId){
+    private Response confirm(int ratingId, Request request){
         //später durch aktuellen authentifizierten User ersetzen
-        int userId = 1;
         Response response = new Response();
         response.setContentType(ContentType.TEXT_PLAIN);
+        auth(request);
+        int userId = getUserId(request);
         try{
             boolean done = ratingService.confirm(ratingId, userId);
             response.setStatus(Status.CREATED);
-            response.setBody("done: true, confirmed: ratingId: "+ratingId + ", userId: "+ userId);
+            response.setBody("done: "+done+", confirmed: ratingId: "+ratingId + ", userId: "+ userId);
             return json(response,Status.CREATED);
-        } catch (DuplicateAlreadyExistsException e){
+        } catch (EntityNotFoundException e){
             response.setStatus(Status.CONFLICT);
             response.setBody("done: false, confirmed:  ratingId: "+ratingId + ", userId: "+ userId+ ", err: rating does not exist");
             return json(response,Status.CONFLICT);

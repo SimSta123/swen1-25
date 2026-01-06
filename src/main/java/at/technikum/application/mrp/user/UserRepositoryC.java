@@ -71,6 +71,16 @@ public class UserRepositoryC implements UserRepository {
               )
             """;
 
+    private static final String FAV_NUMBER =
+            "SELECT COUNT(*) FROM favorites WHERE userId = ?";
+
+    private static final String MEDIA_NUMBER =
+            "SELECT COUNT(*) FROM media WHERE creator_id = ?";
+
+    private static final String RATINGS_NUMBER =
+            "SELECT COUNT(*) FROM ratings WHERE userid = ?";
+
+
     public UserRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
@@ -316,6 +326,57 @@ public class UserRepositoryC implements UserRepository {
             System.out.println(e.getMessage());
             e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    public int favNumber(int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(FAV_NUMBER);
+        ){
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public int mediaNumber(int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(MEDIA_NUMBER);
+        ){
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public int ratingsNumber(int userId){
+        try (
+                Connection conn = connectionPool.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(RATINGS_NUMBER);
+        ){
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 

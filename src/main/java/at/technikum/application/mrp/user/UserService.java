@@ -24,7 +24,6 @@ public class UserService {
     //zum Testen
     public UserService() {
         this.userRepository = null;
-        this.users = new ArrayList<>();
     }
 
     public User get(int id) {
@@ -42,6 +41,7 @@ public class UserService {
 
     public boolean update(User update, int userId) {
         update.setId(userId);
+        if(update.getUsername()==null||update.getPassword()==null||update.getUsername().isEmpty()||update.getPassword().isEmpty()) throw new IllegalArgumentException("username or pw empty");
         userRepository.update(update);
         return true;
     }
@@ -71,30 +71,12 @@ public class UserService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("UserID not found"));
 
-        /*for(User u : users){
-            System.out.println(u.getId()+"-----------------");
-            if(u.getId() == id){
-                return u;
-            }
-        }
-         */
-        /*
-        Optional<User> optionalUser = userRepository.find(String.valueOf(id));
-        User foundUser = optionalUser.orElseThrow(() ->
-                new EntityNotFoundException("UserID doesn't exist"));
-        return foundUser;
-        */
-    }
-
-    public String getToken(User user){
-        return auth.getToken(user.getUsername());
     }
 
     public List<Media> getAllFavs(int userId){
         List<Media> favs = new ArrayList<>();
         List<Integer> mIds = userRepository.allFavsMediaId(userId);
         if(!mIds.isEmpty()){
-            System.out.println("before for");
             for(int i = 0; i<mIds.toArray().length;i++) {
                 //favs = userRepository.findAllMediaByID();
                 favs.add(userRepository.findMediaByID(mIds.get(i)));
@@ -106,11 +88,20 @@ public class UserService {
         return favs;
     }
 
-    public List<Media> recs(Request request){
-        String type = UrlID.handleRecType(request.getUri());
-        System.out.println("recs: "+ type +", "+ request.getUri());
-        int uid = UrlID.urlID(request.getPath());
+    public List<Media> recs(String type, int uid){
         return userRepository.recs(type, uid);
+    }
+
+    public int favNumber(int userId){
+        return userRepository.favNumber(userId);
+    }
+
+    public int mediaNumber(int userId){
+        return userRepository.mediaNumber(userId);
+    }
+
+    public int ratingNumber(int userId){
+        return userRepository.ratingsNumber(userId);
     }
 }
 

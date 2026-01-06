@@ -19,10 +19,10 @@ public class RatingRepositoryC implements RatingRepository{
             = "SELECT * FROM ratings WHERE id = ? ";
 
     private final String RATING_EXISTS
-            = "SELECT * from ratings WHERE userId = ? AND mediaId = ?";
+            = "SELECT * from ratings WHERE id = ?";
 
     private final String RATING_EXISTS_BY_ID
-            = "SELECT * from ratings WHERE id = ?";
+            = "SELECT * from ratings WHERE id = ? AND userId = ?";
 
     private final String LIKE_RATING
             = "INSERT INTO rating_likes (userId, ratingId) VALUES (?,?)";
@@ -127,13 +127,12 @@ public class RatingRepositoryC implements RatingRepository{
         }
     }
 
-    public boolean ratingExists(int mediaId, int userId) {
+    public boolean ratingExists(int ratingId) {
         try (
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(RATING_EXISTS);
         ) {
-            pstmt.setInt(1, userId);
-            pstmt.setInt(2, mediaId);
+            pstmt.setInt(1, ratingId);
             ResultSet rs = pstmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
@@ -141,12 +140,13 @@ public class RatingRepositoryC implements RatingRepository{
         }
     }
 
-    public boolean ratingExistsById(int rId) {
+    public boolean ratingExistsById(int rId, int userId) {
         try (
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(RATING_EXISTS_BY_ID);
         ) {
             pstmt.setInt(1, rId);
+            pstmt.setInt(2, userId);
             ResultSet rs = pstmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {

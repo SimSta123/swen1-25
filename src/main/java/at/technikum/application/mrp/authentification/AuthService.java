@@ -1,13 +1,12 @@
 package at.technikum.application.mrp.authentification;
 
-
 import at.technikum.application.mrp.user.User;
 import at.technikum.application.todo.exception.EntityNotFoundException;
+import at.technikum.application.todo.exception.NotAuthorizedException;
 import at.technikum.server.http.Response;
 import at.technikum.server.util.TokenStore;
 import java.util.*;
 import java.lang.*;
-
 
 public class AuthService {
 
@@ -36,7 +35,6 @@ public class AuthService {
         if(!authRepository.userLogIn(user)){
             throw new EntityNotFoundException("Username and/or password not found");    //oder UnauthorizedException 401?
         }
-
 
         return this.createToken(user);
     }
@@ -78,6 +76,8 @@ public class AuthService {
     }
 
     public boolean tokenExists(String s, boolean isHeader) {
+        if(s==null||s.isEmpty()) throw new NotAuthorizedException("No credentials given");
+
         String token;
         if(isHeader) {
             token = s.substring(7);//Aus Headerstring nach Bearer

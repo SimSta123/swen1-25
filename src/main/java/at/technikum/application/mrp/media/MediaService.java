@@ -14,17 +14,20 @@ import java.util.Optional;
 public class MediaService {
 
     private final MediaRepositoryC mediaRepository;
-    private final MediaSearchFilterRepository mediaSearchFilterRepository;
-
+    //private final MediaSearchFilterRepository mediaSearchFilterRepository;
+    /*
     public MediaService(MediaRepositoryC mediaRepository, MediaSearchFilterRepository mediaSearchFilterRepository) {
         this.mediaRepository = mediaRepository;
         this.mediaSearchFilterRepository = mediaSearchFilterRepository;
     }
+     */
+
+    public MediaService(MediaRepositoryC mediaRepository) {
+        this.mediaRepository = mediaRepository;
+    }
 
 
     public Media create(Media media) {
-        // is todo valid?
-        System.out.println("in MediaService");
         //media.setTitle(media.getTitle()); //wieso????? woher wie wo was??
         /*  //Falls media einzigartig sein soll
         mediaRepository.find(media.getMediaID())
@@ -69,7 +72,7 @@ public class MediaService {
                 () -> new EntityNotFoundException("MediaID not found")
         );
         if (media.getCreatorID() != creatorId) {
-            throw new IllegalArgumentException("Not the creator, not Authorized");
+            throw new NotAuthorizedException("Not the creator, not Authorized");
         } else {
             mediaRepository.delete(mediaId);
             return true;
@@ -77,8 +80,6 @@ public class MediaService {
     }
     //Hier oder im Ratingservice?
     public boolean createRating(Rating rating, int mediaId) {
-        // is todo valid?
-        //rating.setRating(rating.getRating());
 
         mediaRepository.find(mediaId)
                 .orElseThrow(() ->
@@ -131,7 +132,7 @@ public class MediaService {
         String ageRes = UrlID.handleMediaAgeRestr(url);
         String rating = UrlID.handleMediaRating(url);
         String sortBy = UrlID.handleSortBy(url);
-        medias = mediaSearchFilterRepository.filter(title, genre, mediaType, relYear, ageRes, rating, sortBy);
-        return mediaSearchFilterRepository.getGenres(medias);
+        medias = mediaRepository.filter(title, genre, mediaType, relYear, ageRes, rating, sortBy);
+        return mediaRepository.getGenres(medias);
     }
 }

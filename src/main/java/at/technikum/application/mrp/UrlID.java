@@ -5,7 +5,6 @@ import java.util.regex.*;
 public class UrlID {
 
     public static int urlID(String path) {
-        System.out.println(path);
         // Falls Query-Parameter vorhanden sind -> abschneiden
         path = path.split("\\?")[0];
 
@@ -21,7 +20,6 @@ public class UrlID {
         if (matcher.find()) {
             String resourceType = matcher.group(1); // media, users oder ratings
             int id = Integer.parseInt(matcher.group(2)); // die ID
-            System.out.println("Typ: " + resourceType + ", ID: " + id);
             return id;
         }  else {
             return -1;
@@ -33,15 +31,12 @@ public class UrlID {
         if(queryParams.contains(paramName)) {
             int start = queryParams.indexOf(paramName + "=") + paramName.length() + 1;
             int end;
-            System.out.println("-----&:"+queryParams.indexOf("&"));
             String sub = queryParams.substring(start);
             if(sub.contains("&")){
                 end = queryParams.indexOf("&", start);
             } else {
-                System.out.println("-------------------------------------------------lenght: "+queryParams.length());
                 end = queryParams.length();
             }
-            System.out.println("What: "+ paramName + " start: " + start + ", end: " + end);
             return queryParams.substring(start, end);
         } else {
             return null;
@@ -77,10 +72,8 @@ public class UrlID {
     public static String handleMediaRelYear(String queryParams) {
         String releaseYear = extractQueryParam(queryParams, "releaseYear");
         if (releaseYear == null) {
-            System.out.println("No 'releaseYear' parameter found.");
             return null;
         }
-        System.out.println("URLID: "+releaseYear);
         return releaseYear;
     }
 
