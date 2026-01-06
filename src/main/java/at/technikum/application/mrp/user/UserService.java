@@ -80,7 +80,6 @@ public class UserService {
             for(int i = 0; i<mIds.toArray().length;i++) {
                 //favs = userRepository.findAllMediaByID();
                 favs.add(userRepository.findMediaByID(mIds.get(i)));
-                System.out.println("i");
             }
         } else {
             throw new EntityNotFoundException("Keine Favs gefunden von diesem User");
