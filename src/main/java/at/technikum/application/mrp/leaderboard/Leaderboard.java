@@ -19,6 +19,7 @@ public class Leaderboard {
     public void setUser(User user){
         this.user = user;
     }
+
     @JsonIgnore
     public User getUser(){
         return this.user;

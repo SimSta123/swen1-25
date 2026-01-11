@@ -1,5 +1,5 @@
 SELECT * FROM users
-SELECT * FROM media WHERE creator_id = 1
+SELECT * FROM media
 SELECT * FROM genres
 SELECT * FROM media_genres
 SELECT * FROM ratings

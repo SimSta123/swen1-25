@@ -22,6 +22,7 @@ public class LeaderboardRepositoryC implements LeaderboardRepository {
     private final String GET_ALL_RATINGS_ZWEI
             = "SELECT userId, COUNT(*) AS ratingAnzahl FROM ratings GROUP BY userId ORDER BY ratingAnzahl DESC";
 
+
     public LeaderboardRepositoryC(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
@@ -55,7 +56,7 @@ public class LeaderboardRepositoryC implements LeaderboardRepository {
                     }
                 }
 
-                // wenn nicht gefunden → neuen Eintrag erstellen
+                // wenn nicht gefunden -> neuen Eintrag erstellen
                 if (!found) {
                     User user = new User();
                     user.setId(userId);
@@ -70,7 +71,6 @@ public class LeaderboardRepositoryC implements LeaderboardRepository {
             throw new RuntimeException(e);
         }
          */
-        System.out.println("in findAll repostirory");
         List<Leaderboard> lb = new ArrayList<>();
         try(
                 Connection conn = connectionPool.getConnection();
@@ -79,6 +79,7 @@ public class LeaderboardRepositoryC implements LeaderboardRepository {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 User user = new User();
+                user.setId(rs.getInt("userId"));
                 Leaderboard lb_2 = new Leaderboard(
                         user,
                         rs.getInt("ratingAnzahl")

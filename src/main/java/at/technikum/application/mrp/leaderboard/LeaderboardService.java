@@ -25,24 +25,8 @@ public class LeaderboardService {
     }
 
     public List<Leaderboard> getAll() {
-        System.out.println("in getAll_Service");
         List<Leaderboard> lb = leaderboardRepositoryC.findAll();
-        /*
-        boolean clean = true;
-        while(!clean){
-            for(int i = 0; i<lb.size()-1; i++){
-                if(lb.get(i).ratingAnzahl<lb.get(i+1).getRatingAnzahl()){
-                    lb_2 = lb.get(i);
-                    lb.get(i) = lb.get(i+1);
-                    lb.sort(lb.);
-                }
-            }
-        }
-
-         */
-        System.out.println("in getAll_Service_before_Sort");
         lb.sort(Comparator.comparingInt(Leaderboard::getRatingAnzahl).reversed());  // Größte Zahl zuerst
-        System.out.println("in getAll_Service_after_Sort");
         return lb;
     }
 
