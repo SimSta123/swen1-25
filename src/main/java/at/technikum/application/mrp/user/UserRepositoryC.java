@@ -51,9 +51,11 @@ public class UserRepositoryC implements UserRepository {
             = " SELECT m.mediaid, m.title, m.description, m.creator_id, m.agerestriction, m.average_score, m.mediatype, m.releaseyear FROM media m JOIN media_genres mg ON mg.mediaid = m.mediaid " +
             " WHERE mg.genreid IN (SELECT mg2.genreid FROM ratings r JOIN media_genres mg2 ON mg2.mediaid = r.mediaid WHERE r.userid = ? " +
             "AND r.rating >= 4 ) AND m.mediaid NOT IN (SELECT mediaid FROM ratings WHERE userid = ?)";
+                // IN ( ) ist vergleichsoperator für Mengen (das WHERE soll also zu etwas aus der Menge gleich sein)
+                //Hier: alle GenreIDs von medien die der User bewertet hat
 
     private static final String REC_BY_CONTENT =
-            //mit """ geht ohne so wie oben, why so bloated?
+            //mit """ geht ohne so wie oben
             """
             SELECT DISTINCT m2.mediaid, m2.title, m2.description, m2.creator_id, m2.agerestriction, m2.average_score, m2.mediatype, m2.releaseyear
             FROM ratings r
@@ -69,7 +71,14 @@ public class UserRepositoryC implements UserRepository {
               AND m2.mediaid NOT IN (
                   SELECT mediaid FROM ratings WHERE userid = ?
               )
-            """;
+            """;    //NOT IN damit noch nicht vom USER bewertet
+                    //FROM ratings, weil ich wissen will was der User mag, da Rec (alle ratings mit rating>=4 werden m1)
+                    //JOIN m1 == bewertetes media
+                    //JOIN mg1 == genres von mg1
+                    //JOIN mg2 == genres anderer medien die gleich sind wie mg1
+                    //JOIN m2 == anderes medium (das empfohlene)
+                    //Für jedes m1 wird nach matches gesucht
+                    //<> == !=
 
     private static final String FAV_NUMBER =
             "SELECT COUNT(*) FROM favorites WHERE userId = ?";
@@ -91,7 +100,6 @@ public class UserRepositoryC implements UserRepository {
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(SELECT_BY_ID);
         ) {
-            System.out.println("trying read users");
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (!rs.next()) {
@@ -116,7 +124,6 @@ public class UserRepositoryC implements UserRepository {
                 Connection conn = connectionPool.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(SELECT_ALL);
         ) {
-            System.out.println("trying to read all user");
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (!rs.next()) {
                     return List.of();
@@ -150,11 +157,9 @@ public class UserRepositoryC implements UserRepository {
         try (
                 Connection conn = connectionPool.getConnection();
         ) {
-            System.out.println("trying to delete media");
             try (PreparedStatement pstmt = conn.prepareStatement(DELETE_BY_ID)) {
                 pstmt.setInt(1, Integer.parseInt(id));
                 pstmt.executeUpdate();
-                System.out.println("media deleted");
                 User user = new User();
                 return user;
             }
@@ -170,13 +175,11 @@ public class UserRepositoryC implements UserRepository {
         try (
                 Connection conn = connectionPool.getConnection();
         ) {
-            System.out.println("trying to save user");
             try (PreparedStatement pstmt = conn.prepareStatement(UPDATE_BY_ID)) {
                 pstmt.setString(1, user.getUsername());
                 pstmt.setString(2, user.getPassword());
                 pstmt.setInt(3, user.getId());
                 pstmt.executeUpdate();
-                System.out.println("Database Saved");
                 return true;
             }
 

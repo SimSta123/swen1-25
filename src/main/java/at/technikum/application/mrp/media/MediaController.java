@@ -306,8 +306,9 @@ public class MediaController extends Controller {
             String jsonBody = mapper.writeValueAsString(ls);
             response.setBody(mapper.writeValueAsString(ls));
             //response.setBody();
-            return json(response, Status.OK);
+            //return json(response, Status.OK);
             //return response;
+            return json(ls, Status.OK);
         } catch (EntityNotFoundException e){
             System.out.println(e.getMessage());
             response.setStatus(Status.NOT_FOUND);

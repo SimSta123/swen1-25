@@ -95,14 +95,4 @@ public class LeaderboardRepositoryC implements LeaderboardRepository {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public Leaderboard save(Leaderboard media) {
-        return null;
-    }
-
-    @Override
-    public Leaderboard delete(String Title) {
-        return null;
-    }
 }

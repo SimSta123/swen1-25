@@ -210,7 +210,8 @@ public class UserController extends Controller {
             response.setBody(jsonBody);
 
             response.setStatus(Status.OK);
-            return json(response, Status.OK);
+            //return json(response, Status.OK);
+            return json(rl, Status.OK);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);
             response.setBody("err: "+e.getMessage());
@@ -228,7 +229,8 @@ public class UserController extends Controller {
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = mapper.writeValueAsString(media);
             response.setBody(jsonBody);
-            return json(response, Status.OK);
+            //return json(response, Status.OK);
+            return json(media, Status.OK);
         } catch (EntityNotFoundException e){
             System.out.println(e.getMessage());
             response.setStatus(Status.NOT_FOUND);   //wenn nicht da, dann wird status nicht gesetzt --> Socket hangup
@@ -260,7 +262,8 @@ public class UserController extends Controller {
             String jsonBody = mapper.writeValueAsString(media);
             response.setBody(jsonBody);
             //response.setBody(media.toString());
-            return json(response, Status.OK);
+            //return json(response, Status.OK);       //für die ganze Response
+            return json(media, Status.OK);        //Um besser die Liste zu sehen
         } catch (EntityNotFoundException e){
             System.out.println(e.getMessage());
             response.setStatus(Status.NOT_FOUND);

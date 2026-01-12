@@ -9,9 +9,7 @@ public interface UserRepository {
 
     List<User> findAll();
 
-    Optional<User> save(User user);
-
-    // Todo update(Todo todo);
+    Optional<?> save(User user);
 
     User delete(String id);
 

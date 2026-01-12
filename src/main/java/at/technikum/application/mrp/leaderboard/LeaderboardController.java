@@ -61,12 +61,10 @@ public class LeaderboardController extends Controller {
         response.setStatus(Status.OK);
         response.setContentType(ContentType.TEXT_PLAIN);
         try {
-            System.out.println("in readAll");
             List<Leaderboard> leaderB = leaderboardService.getAll();
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = mapper.writeValueAsString(leaderB);
             response.setBody(jsonBody);
-            System.out.println("XX");
             return json(response, Status.OK);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);

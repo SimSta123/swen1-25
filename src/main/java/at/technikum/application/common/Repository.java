@@ -13,8 +13,6 @@ public interface Repository<T> {
 
     T save(T object);
 
-    // Todo update(Todo todo);
-
     T delete(T object);
 
 }
