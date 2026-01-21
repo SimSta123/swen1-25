@@ -40,10 +40,15 @@ public class MediaService {
     }
 
     public Media get(int id) {
-        return mediaRepository.find(id)
+        Media media = new Media();
+        media = mediaRepository.find(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Media with ID " + id + " not found")
                 );
+        List <Media> list = new ArrayList<>();
+        list.add(media);
+        media.setGenre(mediaRepository.getGenres(list).getFirst().getGenre());
+        return media;
     }
 
     public List<Media> getAll() {
