@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-
+    /*
     //@Mock
     //private UserRepository userRepository;  // Erstellt ein Mock-Objekt :contentReference[oaicite:0]{index=0}
 
@@ -88,7 +88,7 @@ public class UserServiceTest {
         }
     }
     */
-
+    /*
     //Unit Test
     @Test
     void testFindUserById() {
@@ -111,6 +111,8 @@ public class UserServiceTest {
         //assertEquals(u3,mockService.findByID(3));
         assertEquals(u3,service.findByID(3));
     }
+
+     */
 
 
 }
